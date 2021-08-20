@@ -1,0 +1,76 @@
+[
+    {
+        "action": "upperCase",
+        "inputParams": [
+            {
+                "index": 3
+            }
+        ]
+    },
+    {
+        "action": "lowerCase",
+        "inputParams": [
+            {
+                "index": 3
+            }
+        ]
+    },
+    {
+        "action": "camelCase",
+        "inputParams": [
+            {
+                "index": 3
+            }
+        ]
+    },
+    {
+        "action": "concatenate",
+        "inputParams": [
+            {
+                "indexes": [
+                    2,
+                    4,
+                    5
+                ],
+                "joinChar": "-"
+            }
+        ]
+    },
+    {
+        "action": "validation",
+        "inputParams": [
+            {
+                "index": 2,
+                "validType": "email"
+            }
+        ]
+    },
+    {
+        "action": "validation",
+        "inputParams": [
+            {
+                "index": 2,
+                "validType": "creditCard"
+            }
+        ]
+    },
+    {
+        "action": "substitute",
+        "inputParams": [
+            {
+                "index": 2,
+                "matchStr": "UNKNOWN",
+                "replaceStr": "N/A"
+            }
+        ]
+    },
+    {
+        "action": "changeType",
+        "inputParams": [
+            {
+                "index": 2,
+                "dtype": "str"
+            }
+        ]
+    }
+]

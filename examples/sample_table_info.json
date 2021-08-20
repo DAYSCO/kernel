@@ -1,0 +1,26 @@
+{
+  "TableName": "customers.csv",
+  "ColumnCount": 24,
+  "RowCount": 1000,
+  "SizeInKb": 256,
+  "Columns": [
+    {
+      "name": "first_name",
+      "dataType": "string",
+      "nonNullCount": 464,
+      "distinctCount": 12
+    },
+    {
+      "name": "company_name",
+      "dataType": "string",
+      "nonNullCount": 123,
+      "distinctCount": 123
+    },
+    {
+      "name": "ItemCount",
+      "datatType": "Integer",
+      "nonNullCount": 23,
+      "distinctCount": 12
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+[
+    {
+        "action": "concatenate",
+        "description": "Concatenate two or more columns",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "2",
+                "uniqueItems": "false",
+                "items": {
+                    "type": "number"
+                }
+            },
+            {
+                "name": "joinChar",
+                "type": "string",
+                "minLength": "0"
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "upperCase",
+        "description": "Change the casing to upper of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "index",
+                "type": "integer"
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "lowerCase",
+        "description": "Change the casing to lower of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "index",
+                "type": "integer"
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "camelCase",
+        "description": "Change the casing to camel of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "index",
+                "type": "integer"
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "changeType",
+        "description": "Change the dtype in pandas.DataFrame",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "ADDRESS",
+            "CITY",
+            "ZIP",
+            "COUNTRY",
+            "CCNUMBER",
+            "SSNUMBER",
+            "BOOLEAN",
+            "INTEGER",
+            "NUMBER",
+            "DATETIME",
+            "TIME"
+        ],
+        "inputParams": [
+            {
+                "name": "index",
+                "type": "integer"
+            },
+            {
+                "name": "dtype",
+                "type": "name",
+                "validSet": [
+                    "datetime",
+                    "integer",
+                    "float",
+                    "string"
+                ]
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "validate",
+        "description": "Validates data values in a column",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "ADDRESS",
+            "CITY",
+            "ZIP",
+            "COUNTRY",
+            "CCNUMBER",
+            "SSNUMBER",
+            "BOOLEAN",
+            "INTEGER",
+            "NUMBER",
+            "DATETIME",
+            "TIME"
+        ],
+        "inputParams": [
+            {
+                "name": "columnIndex",
+                "type": "integer"
+            },
+            {
+                "name": "validType",
+                "type": "string",
+                "validSet": [
+                    "email",
+                    "creditCard",
+                    "address"
+                ]
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn"
+        ]
+    },
+    {
+        "action": "substitute",
+        "description": "Replace specific values in a column with new value",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "ADDRESS",
+            "CITY",
+            "ZIP",
+            "COUNTRY",
+            "CCNUMBER",
+            "SSNUMBER",
+            "BOOLEAN",
+            "INTEGER",
+            "NUMBER",
+            "DATETIME",
+            "TIME",
+            "ENUM",
+            "PERSONNAME"
+        ],
+        "inputParams": [
+            {
+                "name": "index",
+                "type": "integer"
+            },
+            {
+                "name": "matchStr",
+                "type": "string",
+                "minLength": "1"
+            },
+            {
+                "name": "replaceStr",
+                "type": "string",
+                "minLength": "1"
+            }
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumnData"
+        ]
+    }
+]

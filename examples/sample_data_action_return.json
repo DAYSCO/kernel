@@ -1,0 +1,45 @@
+{
+  "tableInfo": {
+    "TableName": "customers.csv",
+    "ColumnCount": 24,
+    "RowCount": 1000,
+    "SizeInKb": 256,
+    "Columns": [
+      {
+        "name": "first_name",
+        "dataType": "string",
+        "nonNullCount": 464,
+        "distinctCount": 12
+      },
+      {
+        "name": "email",
+        "dataType": "string",
+        "nonNullCount": 123,
+        "distinctCount": 123
+      },
+      {
+        "name": "item_count",
+        "datatType": "Integer",
+        "nonNullCount": 23,
+        "distinctCount": 12
+      }
+    ]
+  },
+  "tableData": {
+    "first_name": {
+      "0": "Nydia",
+      "1": "Jo",
+      "2": "Arron"
+    },
+    "email": {
+      "0": "nhecks0@cnet.com",
+      "1": "jhavock1@tripadvisor.com",
+      "2": "amarrington2@ycombinator.com"
+    },
+    "item_count": {
+      "0": 2500,
+      "1": 15,
+      "2": 3056
+    }
+  }
+}

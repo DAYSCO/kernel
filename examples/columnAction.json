@@ -1,0 +1,346 @@
+[
+    {
+        "action": "camelCase",
+        "displayName": "Camel case",
+        "description": "Change the casing to camel of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            }
+        ],
+        "required": [
+            "indexes"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "changeType",
+        "description": "Change the dtype in pandas.DataFrame",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "ADDRESS",
+            "CITY",
+            "ZIP",
+            "COUNTRY",
+            "CCNUMBER",
+            "SSNUMBER",
+            "BOOLEAN",
+            "INTEGER",
+            "NUMBER",
+            "DATETIME",
+            "TIME",
+            "ENUM",
+            "PERSONNAME"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            },
+            {
+                "name": "newType",
+                "type": "name",
+                "validSet": [
+                    "STRING",
+                    "EMAIL",
+                    "ADDRESS",
+                    "CITY",
+                    "ZIP",
+                    "COUNTRY",
+                    "CCNUMBER",
+                    "SSNUMBER",
+                    "BOOLEAN",
+                    "INTEGER",
+                    "NUMBER",
+                    "DATETIME",
+                    "TIME",
+                    "ENUM",
+                    "PERSONNAME"
+                ]
+            }
+        ],
+        "required": [
+            "indexes",
+            "newType"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "concatenate",
+        "displayName": "Concatenate",
+        "description": "Concatenate two or more columns",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            },
+            {
+                "name": "joinChar",
+                "type": "string",
+                "minLength": "0",
+                "uiControl": {
+                    "controlType": "TEXTBOX",
+                    "displayName": "Join character",
+                    "description": "String used to join two values. May be blank",
+                    "defaultValue": "|",
+                    "length": "20"
+                }
+            }
+        ],
+        "required": [
+            "indexes",
+            "joinChar"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "lowerCase",
+        "displayName": "Lower case",
+        "description": "Change the casing to lower of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            }
+        ],
+        "required": [
+            "indexes"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "substitute",
+        "displayName": "Substitute",
+        "description": "Replace specific values in a column with new value",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "ADDRESS",
+            "CITY",
+            "ZIP",
+            "COUNTRY",
+            "CCNUMBER",
+            "SSNUMBER",
+            "BOOLEAN",
+            "INTEGER",
+            "NUMBER",
+            "DATETIME",
+            "TIME",
+            "ENUM",
+            "PERSONNAME"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            },
+            {
+                "name": "matchStr",
+                "type": "string",
+                "minLength": "1"
+            },
+            {
+                "name": "replaceStr",
+                "type": "string",
+                "minLength": "0"
+            }
+        ],
+        "required": [
+            "indexes",
+            "matchStr",
+            "replaceStr"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumnData"
+        ]
+    },
+    {
+        "action": "upperCase",
+        "displayName": "Upper Case",
+        "description": "Change the casing to upper of a string",
+        "supportedTypes": [
+            "STRING"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            }
+        ],
+        "required": [
+            "indexes"
+        ],
+        "supportedTableActions": [
+            "addColumn",
+            "replaceColumn"
+        ]
+    },
+    {
+        "action": "validate",
+        "description": "Validates data values in a column",
+        "supportedTypes": [
+            "STRING",
+            "EMAIL",
+            "CCNUMBER"
+        ],
+        "inputParams": [
+            {
+                "name": "indexes",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "true",
+                "items": {
+                    "type": "number"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            },
+            {
+                "name": "validType",
+                "type": "array",
+                "minItems": "1",
+                "uniqueItems": "false",
+                "items": {
+                    "type": "string"
+                },
+                "uiControl": {
+                    "controlType": "SELECTEDCOLUMNS"
+                }
+            },
+            {
+                "name": "t/f",
+                "type": "boolean"
+            }
+        ],
+        "required": [
+            "indexes",
+            "validType"
+        ],
+        "supportedTableActions": [
+            "addColumn"
+        ]
+    },
+    {
+        "action": "validate-complex",
+        "description": "Validates compound data values in multiple column",
+        "supportedTypes": [
+            "ADDRESS",
+            "CITY",
+            "STATE",
+            "ZIPCODE"
+        ],
+        "inputParams": [
+            {
+                "name": "address1_index",
+                "type": "integer"
+            },
+            {
+                "name": "address2_index",
+                "type": "integer"
+            },
+            {
+                "name": "city_index",
+                "type": "integer"
+            },
+            {
+                "name": "state_index",
+                "type": "integer"
+            },
+            {
+                "name": "zipcode_index",
+                "type": "integer"
+            },
+            {
+                "name": "validType",
+                "type": "string",
+                "validSet": [
+                    "ADDRESS"
+                ]
+            },
+            {
+                "name": "t/f",
+                "type": "boolean"
+            }
+        ],
+        "required": [
+            "indexes",
+            "validType"
+        ],
+        "supportedTableActions": [
+            "addColumn"
+        ]
+    }
+]
