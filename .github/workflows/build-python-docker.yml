@@ -54,5 +54,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          push: true
+          push: false
           tags: ghcr.io/user/app:latest
