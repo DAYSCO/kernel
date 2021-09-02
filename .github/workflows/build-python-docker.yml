@@ -16,15 +16,15 @@ jobs:
         python-version: [3.9]
 
     steps:
-      - name: Print github workspace
-        run: |
-          echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
-          echo "github.workspace = ${{ github.workspace }}"
-          echo "pr.ref = ${{github.event.pull_request.head.ref}}"
-          echo "github.ref = ${{ github.ref }}"
-          echo "$GITHUB_CONTEXT"
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+      #- name: Print github workspace
+      #  run: |
+      #    echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+      #    echo "github.workspace = ${{ github.workspace }}"
+      #    echo "pr.ref = ${{github.event.pull_request.head.ref}}"
+      #    echo "github.ref = ${{ github.ref }}"
+      #    echo "$GITHUB_CONTEXT"
+      #  env:
+      #    GITHUB_CONTEXT: ${{ toJson(github) }}
       - name: Checout Kernel code
         uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
