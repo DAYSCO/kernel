@@ -55,6 +55,7 @@ VALIDATION_CONFIG = {
         },
         "ZIP": {
             "patterns": TYPE_PATTERNS['ZIP'],
+            "extended_function": Validator.zip_code
         },
         "CCNUMBER": {
             "patterns": TYPE_PATTERNS['CCNUMBER'],

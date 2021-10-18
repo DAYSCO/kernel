@@ -1,11 +1,12 @@
 import pandas as pd
 from flask_api import status
 from flask import jsonify
+
+from app.days.actions import Actions
 from app.manager import Ingester
-from app.controllers import WorkingFile
-from app.profiler import Profiler
-from app.handler import ColumnHandler, TableHandler
-from app.exceptions import IDNotFoundError, PayloadError, InvalidDataTypeError
+from app.days.objects import DaysDataFrame
+from copy import deepcopy
+from app.exceptions import IDNotFoundError, PayloadError
 
 
 class GenericCall:
@@ -33,30 +34,42 @@ class UploadFile(GenericCall):
             self.return_code = status.HTTP_400_BAD_REQUEST
         else:
             try:
-                if self.file_type == 'txt' or self.file_type == 'csv':
+                payload = dict(
+                    TableName=self.file_name,
+                    SizeInKb=self.file_size,
+                    uid=self.uid
+                )
+                if self.file_type in ['txt', 'csv', 'json', 'html']:
+                    data_frame = Ingester.mpfile_upload(
+                        mp_file=self.mp_file,
+                        file_type=self.file_type)
                     self.working_files.add(
-                        WorkingFile(
-                            uid=self.uid,
-                            data_frame=Ingester.mpfile_upload(self.mp_file,
-                                                              self.file_type),
-                            file_name=self.file_name,
-                            file_size=self.file_size))
+                        DaysDataFrame(df=data_frame, payload=payload))
                 elif self.file_type == 'xlsx' or self.file_type == 'xls':
                     sheet_names = pd.ExcelFile(self.mp_file).sheet_names
                     for index, sheet_name in enumerate(sheet_names):
+                        data_frame = Ingester.mpfile_upload(
+                            mp_file=self.mp_file,
+                            file_type=self.file_type,
+                            sheet_name=sheet_name)
+                        payload.update(dict(TableName=sheet_name,
+                                            sheet_index=index))
                         self.working_files.add(
-                            WorkingFile(uid=self.uid,
-                                        data_frame=Ingester.mpfile_upload(
-                                            mp_file=self.mp_file,
-                                            file_type=self.file_type,
-                                            sheet_name=sheet_name),
-                                        file_name=self.file_name,
-                                        file_size=self.file_size,
-                                        sheet_index=index))
+                            DaysDataFrame(df=data_frame, payload=payload))
+                self.payload = {
+                    "newColumns": [],
+                    "message": self.return_message,
+                    "status_code": self.return_code,
+                }
             except Exception as e:
                 self.working_files = working_files
                 self.return_message = repr(e)
                 self.return_code = status.HTTP_400_BAD_REQUEST
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": self.return_code,
+                    "errors": [self.return_message]
+                }
 
 
 class ReadFileContents(GenericCall):
@@ -67,16 +80,29 @@ class ReadFileContents(GenericCall):
             self.return_code = status.HTTP_400_BAD_REQUEST
         else:
             try:
+                payload = dict(
+                    TableName=self.file_name,
+                    SizeInKb=self.file_size,
+                    uid=self.uid
+                )
+                data_frame = Ingester.content_upload(self.data)
                 self.working_files.add(
-                    WorkingFile(
-                        uid=self.uid,
-                        data_frame=Ingester.content_upload(self.data),
-                        file_name=self.file_name,
-                        file_size=self.file_size))
+                    DaysDataFrame(df=data_frame, payload=payload))
+                self.payload = {
+                    "newColumns": [],
+                    "message": self.return_message,
+                    "status_code": self.return_code
+                }
+
             except Exception as e:
                 self.working_files = working_files
                 self.return_message = repr(e)
                 self.return_code = status.HTTP_400_BAD_REQUEST
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": self.return_code,
+                    "errors": [self.return_message]
+                }
 
 
 class TableSchema(GenericCall):
@@ -104,13 +130,21 @@ class TableSchema(GenericCall):
                 try:
                     self.payload = jsonify(self.working_files[self.uid].schema)
                 except IDNotFoundError as e:
-                    self.payload = None
                     self.return_message = str(e)
                     self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        'errors': self.return_code,
+                        'status_code': self.return_code,
+                        'message': self.return_message
+                    }
                 except Exception as e:
-                    self.payload = None
                     self.return_message = repr(e)
                     self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        'errors': self.return_code,
+                        'status_code': self.return_code,
+                        'message': self.return_message
+                    }
 
 
 class TableData(GenericCall):
@@ -122,15 +156,10 @@ class TableData(GenericCall):
         else:
             if self.method == "POST":
                 try:
-                    self.payload = Profiler.get_data(
-                        df=self.working_files[self.uid].data_frame,
-                        schema=self.working_files[self.uid].schema,
-                        start_index=int(self.json_response['startIndex']),
+                    self.payload = self.working_files[self.uid].to_json(
                         row_count=int(self.json_response['rowCount']),
-                        sort_column_index=self.json_response.get(
-                            'sortColumnIndexes'),
-                        sort_ascending=self.json_response.get('sortAscending',
-                                                              True))
+                        start=int(self.json_response['startIndex'])
+                    )
                 except IDNotFoundError as e:
                     self.payload = None
                     self.return_message = str(e)
@@ -165,52 +194,39 @@ class ColumnAction(GenericCall):
             self.return_code = status.HTTP_400_BAD_REQUEST
         else:
             try:
-                df, new_schema, action_sequence, insert_indexes = \
-                    ColumnHandler.execute(
-                        df=self.working_files[self.uid].data_frame,
-                        schema=self.working_files[self.uid].schema,
-                        payload=self.json_response)
-            except IDNotFoundError as e:
-                self.return_message = str(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
-                return
-            except PayloadError as e:
-                self.return_message = str(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
-                return
-            except InvalidDataTypeError as e:
-                self.return_message = str(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
-                return
+                ddf = deepcopy(self.working_files[self.uid])
+                ddf, payload_res = Actions.execute(
+                    ddf=ddf,
+                    payload=self.json_response)
             except Exception as e:
                 self.return_message = str(e)
                 self.return_code = status.HTTP_400_BAD_REQUEST
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": self.return_code,
+                    "errors": [self.return_message]
+                }
                 return
-            try:
-                self.working_files.update_df(
-                    df=df,
-                    uid=self.uid)
-            except Exception as e:
-                self.return_message = str(e)
+            errors = payload_res.get('errors')
+            if len(errors):
+                self.return_message = str(errors[-1])
                 self.return_code = status.HTTP_400_BAD_REQUEST
-                return
-            if new_schema:
-                try:
-                    self.working_files.update_schema(uid=self.uid,
-                                                     schema=new_schema)
-                except Exception as e:
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    return
-            if action_sequence:
-                self.working_files.update_schema(
-                    uid=self.uid,
-                    action_sequence=action_sequence)
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": errors[-1],
+                    "errors": errors
+                }
+
+            new_columns = payload_res.get('new_columns')
+            action = payload_res.get('action')
+            self.working_files.add(ddf)
+            if action:
+                ddf.update_action_sequence(action=action)
             self.payload = {
-                "newColumns": insert_indexes,
+                "newColumns": new_columns,
                 "message": self.return_message,
                 "status_code": self.return_code
-                }
+            }
 
 
 class TableAction(GenericCall):
@@ -221,39 +237,55 @@ class TableAction(GenericCall):
             self.return_code = status.HTTP_400_BAD_REQUEST
         else:
             if action == 'undo':
-                df, new_schema, indexes, remove_indexes = TableHandler.undo(
-                    df=self.working_files[self.uid].data_frame,
-                    schema=self.working_files[self.uid].schema)
-                if not df.empty:
-                    self.working_files.update_df(
-                        uid=self.uid,
-                        df=df)
-                if new_schema:
-                    self.working_files.update_schema(
-                        uid=self.uid,
-                        schema=new_schema,)
-                self.working_files.update_schema(
-                    uid=self.uid,
-                    action_sequence='undo')
+                if len(self.working_files[self.uid].action_sequence) == 0:
+                    return
+                ddf = deepcopy(self.working_files[self.uid])
+                ddf, payload_res = Actions.execute(
+                    ddf=ddf,
+                    payload={'action': action})
+                errors = payload_res.get('errors')
+                if len(errors):
+                    self.return_message = str(errors[-1])
+                    self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        "message": self.return_message,
+                        "status_code": self.return_code,
+                        "errors": errors
+                    }
+                    return
+
+                self.working_files.add(ddf)
+                ddf.update_action_sequence()
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": self.return_code
+                }
             else:
                 try:
-                    self.payload = TableHandler.execute(
-                        df=self.working_files[self.uid].data_frame,
-                        schema=self.working_files[self.uid].schema,
-                        payload=self.json_response,
-                        uid=self.uid)
-                except IDNotFoundError as e:
-                    self.payload = None
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    return
-                except PayloadError as e:
-                    self.payload = None
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    return
+                    ddf, payload_res = Actions.execute(
+                        ddf=self.working_files[self.uid],
+                        payload=self.json_response)
                 except Exception as e:
-                    self.payload = None
                     self.return_message = str(e)
                     self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        "message": self.return_message,
+                        "status_code": self.return_code,
+                        "errors": [str(e)]
+                    }
                     return
+                errors = payload_res.get('errors')
+                if len(errors):
+                    self.return_message = str(errors[-1])
+                    self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        "message": self.return_message,
+                        "status_code": self.return_code,
+                        "errors": errors
+                    }
+                    return
+                self.payload = {
+                    "message": self.return_message,
+                    "status_code": self.return_code,
+                    "file_path": payload_res.get('file_path')
+                }

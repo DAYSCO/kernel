@@ -195,16 +195,26 @@
             ]
         }
     },
-    "test_4_validate_address": {
+    "test_4_validate": {
         "payload": {
             "action": "validate",
             "inputParams": [
                 {
                     "indexes": [
-                        10
+                        2,
+                        3,
+                        4,
+                        5,
+                        10,
+                        11
                     ],
                     "validType": [
-                        "ADDRESS"
+                        "EMAIL",
+                        "GENDER",
+                        "PHONENUMBER",
+                        "DATETIME",
+                        "FULLADDRESS",
+                        "CCNUMBER"
                     ]
                 }
             ]
@@ -216,7 +226,7 @@
             "inputParams": [
                 {
                     "indexes": [
-                        11
+                        15
                     ],
                     "displayNames": [
                         "valid_address"
@@ -231,13 +241,13 @@
             "inputParams": [
                 {
                     "indexes": [
-                        10
+                        14
                     ]
                 }
             ]
         }
     },
-    "test_7_substitute": {
+    "test_7a_substitute": {
         "payload": {
             "action": "substitute",
             "inputParams": [
@@ -247,6 +257,18 @@
                     ],
                     "matchStr": ".net",
                     "replaceStr": ".com"
+                }
+            ]
+        }
+    },
+    "test_7b_update_value": {
+        "payload": {
+            "action": "updateValue",
+            "inputParams": [
+                {
+                    "newValue": "test",
+                    "indexes": 1,
+                    "targetRowIndex": 2
                 }
             ]
         }
@@ -270,7 +292,7 @@
             "inputParams": [
                 {
                     "indexes": [
-                        6
+                        11
                     ],
                     "datetimeFormat": "%d-%m-%Y"
                 }
@@ -309,54 +331,75 @@
         "ActionSequence": [
             {
                 "action": "concatenate",
-                "indexes": [
-                    6,
-                    7,
-                    8,
-                    9
+                "inputParams": [
+                    {
+                        "indexes": [
+                            6,
+                            7,
+                            8,
+                            9
+                        ],
+                        "joinChar": " "
+                    }
                 ],
-                "joinCharacter": " "
+                "newColumns": [
+                    10
+                ]
             },
             {
                 "action": "changeType",
-                "indexes": [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    8,
-                    9,
-                    10,
-                    11
+                "inputParams": [
+                    {
+                        "indexes": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11
+                        ],
+                        "newType": [
+                            "FIRSTNAME",
+                            "LASTNAME",
+                            "EMAIL",
+                            "GENDER",
+                            "PHONENUMBER",
+                            "DATETIME",
+                            "STRING",
+                            "CITY",
+                            "STATE",
+                            "ZIP",
+                            "ADDRESS",
+                            "CCNUMBER"
+                        ]
+                    }
                 ],
                 "schema": [
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "FIRSTNAME",
+                        "dataType": "string",
                         "displayName": "first_name",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "43156059-aa88-41d6-a48f-6d1a2fedb0c1",
                         "index": 0,
                         "name": "first_name",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "LASTNAME",
+                        "dataType": "string",
                         "displayName": "last_name",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "9a98dd03-1757-4deb-a114-f5a6a732f4d6",
                         "index": 1,
                         "name": "last_name",
                         "nonNullCount": 5,
@@ -364,13 +407,11 @@
                     },
                     {
                         "customType": "EMAIL",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "dataType": "string",
                         "displayName": "email",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "f44e0de0-e9f6-495c-bdd9-2dfc93e9fb1f",
                         "index": 2,
                         "name": "email",
                         "nonNullCount": 5,
@@ -378,13 +419,11 @@
                     },
                     {
                         "customType": "GENDER",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "dataType": "string",
                         "displayName": "gender",
-                        "distinctCount": 2,
-                        "extended": {
-
-                        },
+                        "distinctCount": 3,
+                        "extended": {},
+                        "id": "5c632615-4a0b-4fd4-8413-e2896bd0ea79",
                         "index": 3,
                         "name": "gender",
                         "nonNullCount": 5,
@@ -392,13 +431,11 @@
                     },
                     {
                         "customType": "PHONENUMBER",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "dataType": "string",
                         "displayName": "phone_number",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "1b353629-7da0-4fe8-aa7d-7d29c7c852ef",
                         "index": 4,
                         "name": "phone_number",
                         "nonNullCount": 5,
@@ -406,55 +443,47 @@
                     },
                     {
                         "customType": "DATETIME",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "dataType": "string",
                         "displayName": "dob",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "78f65c0a-c92c-46e2-b4b8-ce64b495bdd4",
                         "index": 5,
                         "name": "dob",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "STREETADDRESS",
+                        "dataType": "string",
                         "displayName": "address",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "ee74f6a4-68ee-41f3-957b-40344d651633",
                         "index": 6,
                         "name": "address",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "CITY",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "LASTNAME",
+                        "dataType": "string",
                         "displayName": "city",
-                        "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "distinctCount": 4,
+                        "extended": {},
+                        "id": "af189554-3af8-4ca9-89c3-58d300aa81a5",
                         "index": 7,
                         "name": "city",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "STATE",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "LASTNAME",
+                        "dataType": "string",
                         "displayName": "state",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "1dd22738-eb5a-4a2e-af6d-df84fcc84574",
                         "index": 8,
                         "name": "state",
                         "nonNullCount": 5,
@@ -462,91 +491,95 @@
                     },
                     {
                         "customType": "ZIP",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "dataType": "string",
                         "displayName": "zipcode",
                         "distinctCount": 2,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "f22f1e89-c7c3-4801-b958-577c5d958c40",
                         "index": 9,
                         "name": "zipcode",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
-                        "displayName": "concat_address_city_state_zipcode",
+                        "customType": "STREETADDRESS",
+                        "dataType": "string",
+                        "displayName": "address_city_state_zipcode_concatenate",
                         "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "extended": {},
+                        "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
                         "index": 10,
-                        "name": "concat_address_city_state_zipcode",
+                        "name": "address_city_state_zipcode_concatenate",
                         "nonNullCount": 5,
                         "visible": true
                     },
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
+                        "customType": "CCNUMBER",
+                        "dataType": "string",
                         "displayName": "cc_number",
-                        "distinctCount": 5,
-                        "extended": {
-
-                        },
+                        "distinctCount": 4,
+                        "extended": {},
+                        "id": "2a5a8e73-bdbc-4dcb-956f-3754bb1da28c",
                         "index": 11,
                         "name": "cc_number",
                         "nonNullCount": 5,
                         "visible": true
                     }
-                ],
-                "type": [
-                    "FIRSTNAME",
-                    "LASTNAME",
-                    "EMAIL",
-                    "GENDER",
-                    "PHONENUMBER",
-                    "DATETIME",
-                    "STRING",
-                    "CITY",
-                    "STATE",
-                    "ZIP",
-                    "ADDRESS",
-                    "CCNUMBER"
                 ]
             },
             {
                 "action": "validate",
-                "indexes": [
-                    10
+                "inputParams": [
+                    {
+                        "indexes": [
+                            2,
+                            3,
+                            4,
+                            5,
+                            10,
+                            11
+                        ],
+                        "validType": [
+                            "EMAIL",
+                            "GENDER",
+                            "PHONENUMBER",
+                            "DATETIME",
+                            "FULLADDRESS",
+                            "CCNUMBER"
+                        ]
+                    }
                 ],
-                "validTypes": [
-                    "ADDRESS"
+                "newColumns": [
+                    3,
+                    5,
+                    7,
+                    9,
+                    15,
+                    17
                 ]
             },
             {
                 "action": "rename",
-                "displayNames": [
-                    "valid_address"
-                ],
-                "indexes": [
-                    11
+                "inputParams": [
+                    {
+                        "displayNames": [
+                            "valid_address"
+                        ],
+                        "indexes": [
+                            15
+                        ]
+                    }
                 ],
                 "schema": [
                     {
-                        "customType": "STRING",
-                        "dataType": "object",
-                        "datetimeFormat": "%Y-%m-%d",
-                        "displayName": "validation_concat_address_city_state_zipcode_ADDRESS",
-                        "distinctCount": 2,
-                        "extended": {
-
-                        },
-                        "index": 11,
-                        "name": "validation_concat_address_city_state_zipcode_ADDRESS",
+                        "customType": "CCNUMBER",
+                        "dataType": "string",
+                        "displayName": "cc_number",
+                        "distinctCount": 4,
+                        "extended": {},
+                        "id": "2a5a8e73-bdbc-4dcb-956f-3754bb1da28c",
+                        "index": 16,
+                        "name": "cc_number",
                         "nonNullCount": 5,
                         "visible": true
                     }
@@ -554,53 +587,94 @@
             },
             {
                 "action": "remove",
-                "indexes": [
-                    10
+                "inputParams": [
+                    {
+                        "indexes": [
+                            14
+                        ]
+                    }
                 ]
             },
             {
                 "action": "substitute",
-                "indexes": [
-                    2
+                "inputParams": [
+                    {
+                        "indexes": [
+                            2
+                        ],
+                        "matchStr": ".net",
+                        "replaceStr": ".com"
+                    }
                 ],
-                "matchStr": ".net",
-                "replaceStr": ".com"
+                "newColumns": [
+                    3
+                ]
+            },
+            {
+                "action": "substitute",
+                "inputParams": [
+                    {
+                        "indexes": [
+                            2
+                        ],
+                        "matchStr": ".net",
+                        "replaceStr": ".com"
+                    }
+                ],
+                "newColumns": [
+                    3
+                ]
+            },
+            {
+                "action": "substitute",
+                "inputParams": [
+                    {
+                        "indexes": [
+                            2
+                        ],
+                        "matchStr": ".net",
+                        "replaceStr": ".com"
+                    }
+                ],
+                "newColumns": [
+                    3
+                ]
+            },
+            {
+                "action": "updateValue",
+                "inputParams": [
+                    {
+                        "indexes": 1,
+                        "newValue": "test",
+                        "targetRowIndex": 2
+                    }
+                ],
+                "oldValue": "Marrington"
             },
             {
                 "action": "formatDateTime",
-                "datetimeFormat": "%d-%m-%Y",
-                "indexes": [
-                    6
-                ],
-                "schema": [
+                "inputParams": [
                     {
-                        "customType": "DATETIME",
-                        "dataType": "datetime64[ns]",
-                        "datetimeFormat": "%Y-%m-%d",
-                        "displayName": "dob",
-                        "distinctCount": 5,
-                        "extended": {
-
-                        },
-                        "index": 6,
-                        "name": "dob",
-                        "nonNullCount": 5,
-                        "visible": true
+                        "datetimeFormat": "%d-%m-%Y",
+                        "indexes": [
+                            11
+                        ]
                     }
+                ],
+                "newColumns": [
+                    12
                 ]
             }
         ],
-        "ColumnCount": 13,
+        "ColumnCount": 21,
         "Columns": [
             {
                 "customType": "FIRSTNAME",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "first_name",
                 "distinctCount": 5,
-                "extended": {
-
-                },
+                "extended": {},
+                "id": "43156059-aa88-41d6-a48f-6d1a2fedb0c1",
                 "index": 0,
                 "name": "first_name",
                 "nonNullCount": 5,
@@ -609,12 +683,10 @@
             {
                 "customType": "LASTNAME",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "last_name",
                 "distinctCount": 5,
-                "extended": {
-
-                },
+                "extended": {},
+                "id": "9a98dd03-1757-4deb-a114-f5a6a732f4d6",
                 "index": 1,
                 "name": "last_name",
                 "nonNullCount": 5,
@@ -623,12 +695,10 @@
             {
                 "customType": "EMAIL",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "email",
                 "distinctCount": 5,
-                "extended": {
-
-                },
+                "extended": {},
+                "id": "f44e0de0-e9f6-495c-bdd9-2dfc93e9fb1f",
                 "index": 2,
                 "name": "email",
                 "nonNullCount": 5,
@@ -637,69 +707,143 @@
             {
                 "customType": "EMAIL",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
-                "displayName": "sub_email",
+                "displayName": "email_substitute__2",
                 "distinctCount": 5,
-                "extended": {
-
-                },
+                "extended": {},
+                "id": "4d4a020b-6b0a-4179-9c03-1bf23754a07b",
                 "index": 3,
-                "name": "sub_email",
+                "name": "email_substitute__2",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "EMAIL",
+                "dataType": "string",
+                "displayName": "email_substitute__1",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "851f752c-cd13-4d96-a221-c77abf94c3f6",
+                "index": 4,
+                "name": "email_substitute__1",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "EMAIL",
+                "dataType": "string",
+                "displayName": "email_substitute",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "783bf4ea-45ea-4fca-b649-2d0c8bfa926a",
+                "index": 5,
+                "name": "email_substitute",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "EMAIL",
+                "dataType": "string",
+                "displayName": "email_validate",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "98e3a3a4-bf75-4d2a-b412-29e6ade91366",
+                "index": 6,
+                "name": "email_validate",
                 "nonNullCount": 5,
                 "visible": true
             },
             {
                 "customType": "GENDER",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "gender",
-                "distinctCount": 2,
-                "extended": {
-
-                },
-                "index": 4,
+                "distinctCount": 3,
+                "extended": {},
+                "id": "5c632615-4a0b-4fd4-8413-e2896bd0ea79",
+                "index": 7,
                 "name": "gender",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "GENDER",
+                "dataType": "string",
+                "displayName": "gender_validate",
+                "distinctCount": 3,
+                "extended": {},
+                "id": "f1b66f89-2319-459f-b62e-687ca08e7ab6",
+                "index": 8,
+                "name": "gender_validate",
                 "nonNullCount": 5,
                 "visible": true
             },
             {
                 "customType": "PHONENUMBER",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "phone_number",
                 "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 5,
+                "extended": {},
+                "id": "1b353629-7da0-4fe8-aa7d-7d29c7c852ef",
+                "index": 9,
                 "name": "phone_number",
                 "nonNullCount": 5,
                 "visible": true
             },
             {
+                "customType": "PHONENUMBER",
+                "dataType": "string",
+                "displayName": "phone_number_validate",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "37058fda-04b7-4d44-a421-91dfe80565b7",
+                "index": 10,
+                "name": "phone_number_validate",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
                 "customType": "DATETIME",
-                "dataType": "datetime64[ns]",
-                "datetimeFormat": "%d-%m-%Y",
+                "dataType": "string",
                 "displayName": "dob",
                 "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 6,
+                "extended": {},
+                "id": "78f65c0a-c92c-46e2-b4b8-ce64b495bdd4",
+                "index": 11,
                 "name": "dob",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "DATETIME",
+                "dataType": "string",
+                "displayName": "dob_date_format",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "ba442e16-f062-47b8-98fc-b6ee4bd283ff",
+                "index": 12,
+                "name": "dob_date_format",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "DATETIME",
+                "dataType": "string",
+                "displayName": "dob_validate",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "31010def-26b2-4339-88c3-cac553ea771d",
+                "index": 13,
+                "name": "dob_validate",
                 "nonNullCount": 5,
                 "visible": true
             },
             {
                 "customType": "STRING",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "address",
                 "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 7,
+                "extended": {},
+                "id": "ee74f6a4-68ee-41f3-957b-40344d651633",
+                "index": 14,
                 "name": "address",
                 "nonNullCount": 5,
                 "visible": true
@@ -707,13 +851,11 @@
             {
                 "customType": "CITY",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "city",
-                "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 8,
+                "distinctCount": 4,
+                "extended": {},
+                "id": "af189554-3af8-4ca9-89c3-58d300aa81a5",
+                "index": 15,
                 "name": "city",
                 "nonNullCount": 5,
                 "visible": true
@@ -721,13 +863,11 @@
             {
                 "customType": "STATE",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "state",
                 "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 9,
+                "extended": {},
+                "id": "1dd22738-eb5a-4a2e-af6d-df84fcc84574",
+                "index": 16,
                 "name": "state",
                 "nonNullCount": 5,
                 "visible": true
@@ -735,13 +875,11 @@
             {
                 "customType": "ZIP",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
                 "displayName": "zipcode",
                 "distinctCount": 2,
-                "extended": {
-
-                },
-                "index": 10,
+                "extended": {},
+                "id": "f22f1e89-c7c3-4801-b958-577c5d958c40",
+                "index": 17,
                 "name": "zipcode",
                 "nonNullCount": 5,
                 "visible": true
@@ -749,42 +887,36 @@
             {
                 "customType": "ADDRESS",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
-                "displayName": "concat_address_city_state_zipcode",
+                "displayName": "address_city_state_zipcode_concatenate",
                 "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 11,
-                "name": "concat_address_city_state_zipcode",
-                "nonNullCount": 5,
-                "visible": false
-            },
-            {
-                "customType": "STRING",
-                "dataType": "object",
-                "datetimeFormat": "%Y-%m-%d",
-                "displayName": "valid_address",
-                "distinctCount": 2,
-                "extended": {
-
-                },
-                "index": 12,
-                "name": "validation_concat_address_city_state_zipcode_ADDRESS",
+                "extended": {},
+                "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
+                "index": 18,
+                "name": "address_city_state_zipcode_concatenate",
                 "nonNullCount": 5,
                 "visible": true
             },
             {
                 "customType": "CCNUMBER",
                 "dataType": "string",
-                "datetimeFormat": "%Y-%m-%d",
-                "displayName": "cc_number",
-                "distinctCount": 5,
-                "extended": {
-
-                },
-                "index": 13,
+                "displayName": "valid_address",
+                "distinctCount": 4,
+                "extended": {},
+                "id": "2a5a8e73-bdbc-4dcb-956f-3754bb1da28c",
+                "index": 20,
                 "name": "cc_number",
+                "nonNullCount": 5,
+                "visible": true
+            },
+            {
+                "customType": "CCNUMBER",
+                "dataType": "string",
+                "displayName": "cc_number_validate",
+                "distinctCount": 5,
+                "extended": {},
+                "id": "090ddbd1-1de6-4718-9d92-c4ff299fa088",
+                "index": 21,
+                "name": "cc_number_validate",
                 "nonNullCount": 5,
                 "visible": true
             }
@@ -792,110 +924,139 @@
         "RowCount": 5,
         "SizeInKb": "702",
         "TableName": "test_file.csv"
-    }},
+        }
+    },
     "test_92_get_data": {
         "payload": {
             "startIndex": 0,
-            "rowCount": 5
+            "rowCount": 4
         },
         "check_result":{
-            "first_name": {
-                "0": "Michael",
-                "1": "Jo",
-                "2": "Arron",
-                "3": "Sibylle",
-                "4": "Shaun"
-            },
-            "last_name": {
-                "0": "Vecchione",
-                "1": "Havock",
-                "2": "Marrington",
-                "3": "Mathiot",
-                "4": "Gregh"
-            },
-            "email": {
-                "0": "michaelv@playwithmydata.com",
-                "1": "jhavock1@tripadvisor.net",
-                "2": "amarrington2@ycombinator.com",
-                "3": "smathiot3@gov.uk",
-                "4": "sgregh4@friendfeed.com"
-            },
-            "sub_email": {
-                "0": "michaelv@playwithmydata.com",
-                "1": "jhavock1@tripadvisor.com",
-                "2": "amarrington2@ycombinator.com",
-                "3": "smathiot3@gov.uk",
-                "4": "sgregh4@friendfeed.com"
-            },
-            "gender": {
-                "0": "Male",
-                "1": "Male",
-                "2": "Male",
-                "3": "Female",
-                "4": "Female"
-            },
-            "phone_number": {
-                "0": "978-888-1765",
-                "1": "502-451-4133",
-                "2": "281-500-2488",
-                "3": "850-935-9073",
-                "4": "303-983-8936"
-            },
-            "dob": {
-                "0": "25-10-1993",
-                "1": "20-04-2014",
-                "2": "04-08-1994",
-                "3": "27-03-2011",
-                "4": "29-07-1943"
-            },
             "address": {
                 "0": "8 Stone Place",
-                "1": "06 Victoria Pass",
-                "2": "2 Eagle Crest Center",
-                "3": "01312 Spohn Way",
-                "4": "634 Comanche Park"
-            },
-            "city": {
-                "0": "Somerville",
-                "1": "Louisville",
-                "2": "Pasadena",
-                "3": "Panama City",
-                "4": "Denver"
-            },
-            "state": {
-                "0": "Massachusetts",
-                "1": "Kentucky",
-                "2": "Texas",
-                "3": "Florida",
-                "4": "Colorado"
-            },
-            "zipcode": {
-                "0": "02143",
-                "1": "12345",
-                "2": "12345",
-                "3": "12345",
-                "4": "12345"
-            },
-            "concat_address_city_state_zipcode": {
-                "0": "8 Stone Place Somerville Massachusetts 02143",
-                "1": "06 Victoria Pass Louisville Kentucky 12345",
-                "2": "2 Eagle Crest Center Pasadena Texas 12345",
-                "3": "01312 Spohn Way Panama City Florida 12345",
-                "4": "634 Comanche Park Denver Colorado 12345"
-            },
-            "valid_address": {
-                "0": "8 Stone Pl Somerville MA 02143-3007",
-                "1": "no valid street address found",
-                "2": "no valid street address found",
-                "3": "no valid street address found",
-                "4": "no valid street address found"
+                "1": "06 test Pass",
+                "2": "2 test",
+                "3": "01312 Spohn Way"
             },
             "cc_number": {
                 "0": "378282246310005",
                 "1": "371449635398431",
                 "2": "378734493671000",
-                "3": "nan",
-                "4": "30569309025904"
+                "3": ""
+            },
+            "cc_number_validate": {
+                "0": "378282246310005",
+                "1": "371449635398431",
+                "2": "378734493671000",
+                "3": "INVALID"
+            },
+            "city": {
+                "0": "Somerville",
+                "1": "test",
+                "2": "test",
+                "3": "Panama City"
+            },
+            "dob": {
+                "0": "10/25/1993",
+                "1": "4/20/2014",
+                "2": "8/4/1994",
+                "3": "3/27/2011"
+            },
+            "dob_date_format": {
+                "0": "25-10-1993",
+                "1": "20-04-2014",
+                "2": "04-08-1994",
+                "3": "27-03-2011"
+            },
+            "dob_validate": {
+                "0": "10/25/1993",
+                "1": "4/20/2014",
+                "2": "8/4/1994",
+                "3": "3/27/2011"
+            },
+            "email": {
+                "0": "michaelv@)playwithmydata.com",
+                "1": "jhavock1)tripadvisor.net",
+                "2": "amarrington2@ycombinator.com",
+                "3": "smathiot3@gov.uk"
+            },
+            "email_substitute": {
+                "0": "michaelv@)playwithmydata.com",
+                "1": "jhavock1)tripadvisor.com",
+                "2": "amarrington2@ycombinator.com",
+                "3": "smathiot3@gov.uk"
+            },
+            "email_substitute__1": {
+                "0": "michaelv@)playwithmydata.com",
+                "1": "jhavock1)tripadvisor.com",
+                "2": "amarrington2@ycombinator.com",
+                "3": "smathiot3@gov.uk"
+            },
+            "email_substitute__2": {
+                "0": "michaelv@)playwithmydata.com",
+                "1": "jhavock1)tripadvisor.com",
+                "2": "amarrington2@ycombinator.com",
+                "3": "smathiot3@gov.uk"
+            },
+            "email_validate": {
+                "0": "INVALID",
+                "1": "INVALID",
+                "2": "amarrington2@ycombinator.com",
+                "3": "smathiot3@gov.uk"
+            },
+            "first_name": {
+                "0": "Michael",
+                "1": "Jo",
+                "2": "Arron",
+                "3": "Sibylle"
+            },
+            "gender": {
+                "0": "Male",
+                "1": "TE",
+                "2": "Male",
+                "3": "Female"
+            },
+            "gender_validate": {
+                "0": "Male",
+                "1": "INVALID",
+                "2": "Male",
+                "3": "Female"
+            },
+            "last_name": {
+                "0": "Vecchione",
+                "1": "Havock",
+                "2": "test",
+                "3": "Mathiot"
+            },
+            "phone_number": {
+                "0": "978-888-1765",
+                "1": "502-451-4133",
+                "2": "281-500-2488",
+                "3": "850-935-9073"
+            },
+            "phone_number_validate": {
+                "0": "978-888-1765",
+                "1": "502-451-4133",
+                "2": "281-500-2488",
+                "3": "850-935-9073"
+            },
+            "state": {
+                "0": "Massachusetts",
+                "1": "test",
+                "2": "Texas",
+                "3": "Florida"
+            },
+            "valid_address": {
+                "0": "8 Stone Pl Somerville MA 02143-3007",
+                "1": "06 Test Pass Schenectady NY 12345-0001",
+                "2": "2 Test Test Schenectady NY 12345-0001",
+                "3": "INVALID"
+            },
+            "zipcode": {
+                "0": "02143",
+                "1": "12345",
+                "2": "12345",
+                "3": "12345"
             }
         }
     },

@@ -86,7 +86,7 @@ class WorkingFile:
             "customType": ex.get('customType',
                                  "STRING") if ex else self.suggested_type(
                 column_name),
-            "datetimeFormat": ex.get('datetimeFormat', "%Y-%m-%d"),
+            # "datetimeFormat": ex.get('datetimeFormat', "%Y-%m-%d"),
             "dataType": str(self.data_frame[column_name].dtype),
             "displayName": ex.get('displayName', column_name),
             "distinctCount": ex.get('distinctCount',
@@ -168,7 +168,7 @@ class WorkingFile:
         data = self.data_frame[col].dropna()
         try:
             set(data)
-        except TypeError as e:
+        except TypeError:
             return "String"
         if row_count != len(self.data_frame[col]):
             data = data.sample(row_count, replace=True)
