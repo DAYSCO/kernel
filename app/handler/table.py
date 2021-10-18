@@ -2,6 +2,8 @@ import json
 
 from app.exceptions import PayloadError
 from app.manager import Exporter
+from app.days.actions import Actions
+
 
 class TableHandler:
     @classmethod
@@ -28,7 +30,7 @@ class TableHandler:
             new_schema = remove_indexes = indexes = list()
 
             if action in ["upperCase", "lowerCase", "camelCase", "substitute",
-                          "validate"]:
+                          "validate", "formatDateTime"]:
                 indexes = action_details['indexes']
                 remove_indexes = [i + index for i, index in
                                   zip(range(1, len(indexes) + 1), indexes)]
@@ -64,22 +66,13 @@ class TableHandler:
                         "visible": True,
                     }
                     new_schema.append(_schema)
-            elif action == "formatDateTime":
-                indexes = action_details['indexes']
-                schema = action_details['schema']
-                for index, schema_value in zip(indexes, schema):
-                    _schema = {
-                        'index': index,
-                        'datetimeFormat': schema_value['datetimeFormat']
-                    }
-                    new_schema.append(_schema)
             elif action == "rename":
                 indexes = action_details['indexes']
                 schema = action_details['schema']
                 for index, schema_value in zip(indexes, schema):
                     _schema = {
                         "index": index,
-                        "displayNames": schema_value['displayNames'],
+                        "displayName": schema_value['displayName'],
                     }
                     new_schema.append(_schema)
             return df, new_schema, indexes, remove_indexes

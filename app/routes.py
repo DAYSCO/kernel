@@ -37,7 +37,10 @@ def upload_file():
         working_files=working_files)
     working_files = request_obj.working_files
     logger.info(f"{request_obj.return_message} {request_obj.return_code}")
-    return request_obj.return_message, request_obj.return_code
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code
 
 
 @app_bp.route('/api/v1/read-file-contents', methods=['POST'])
@@ -49,7 +52,10 @@ def read_file_contents():
         working_files=working_files)
     working_files = request_obj.working_files
     logger.info(f"{request_obj.return_message} {request_obj.return_code}")
-    return request_obj.return_message, request_obj.return_code
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code
 
 
 @app_bp.route('/api/v1/table/info', methods=['PUT', 'GET'])
@@ -117,11 +123,15 @@ def table_data():
 
 @app_bp.route('/api/v1/table/undo', methods=['GET', 'PUT'])
 def undo_action():
-    logger.info(f"'perform undo action' {request.method} request, {request.remote_addr}")
+    logger.info(f"'perform undo action' "
+                f"{request.method} request, {request.remote_addr}")
     global working_files
     request_obj = TableAction(
         request=request,
         working_files=working_files,
         action='undo')
     logger.info(f"{request_obj.return_message} {request_obj.return_code}")
-    return request_obj.return_message, request_obj.return_code
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code

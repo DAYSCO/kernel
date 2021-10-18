@@ -42,7 +42,7 @@ class Email(str):
     VALIDATION_META = DEFAULT_META
 
 
-class Enum(int):
+class Enum(str):
     VALIDATION_META = DEFAULT_META
 
 
@@ -50,7 +50,7 @@ class Gender(str):
     VALIDATION_META = DEFAULT_META
 
 
-class Integer(int):
+class Integer(str):
     VALIDATION_META = DEFAULT_META
 
 
@@ -58,7 +58,7 @@ class IPAddress(str):
     VALIDATION_META = DEFAULT_META
 
 
-class Number(float):
+class Number(str):
     VALIDATION_META = DEFAULT_META
 
 
@@ -89,4 +89,4 @@ class Datetime(str):
             self.VALIDATION_META['valid'] = True
         except Exception as e:
             self.VALIDATION_META['valid'] = False
-            self.VALIDATION_META['error'].append(str(e))
+            self.VALIDATION_META['errors'].append(str(e))

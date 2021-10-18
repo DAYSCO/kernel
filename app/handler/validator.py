@@ -4,6 +4,7 @@ import idna
 import pandas as pd
 from smartystreets_python_sdk import StaticCredentials, exceptions, Batch, ClientBuilder
 from smartystreets_python_sdk.us_street import Lookup as StreetLookup
+from smartystreets_python_sdk.us_zipcode import Lookup as ZIPCodeLookup
 from app.exceptions import PayloadError
 from app.util import ConnectionManager
 
@@ -70,6 +71,30 @@ class Validator:
         else:
             new_series = ['TRUE' if pattern.match(x) else 'FALSE' for x in series]
         new_name = f"validation_{display_name}_{valid_type}"
+        insert_index = index + 1
+        dupe_limit = 5
+        while True:
+            if dupe_limit == 0:
+                raise Exception("too many dupe column names")
+            try:
+                df.insert(insert_index, new_name, new_series)
+            except ValueError:
+                dupe_limit -= 1
+                _ = new_name.split('__')
+                if len(_) == 1 or not _[-1].isnumeric():
+                    new_name = new_name + "__1"
+                else:
+                    new_name = '__'.join(_[:-1]) + f"__{int(_[-1]) + 1}"
+                continue
+            break
+        return df, insert_index
+
+    @classmethod
+    def zip_code(cls, df, validation, index,  display_name, column_name, invalid="INVALID", t_f=False):
+        new_series = pd.Series([], dtype="string")
+        for x in cls.batch(df[column_name], 100):
+            new_series = new_series.append(cls.smartystreet_zip_code(zipcode=list(x), invalid=invalid, t_f=t_f), ignore_index=True)
+        new_name = f"validation_{display_name}_ZIPCODE"
         insert_index = index + 1
         dupe_limit = 5
         while True:
@@ -171,6 +196,35 @@ class Validator:
                     delivery_last_line = candidates[0].last_line or ''
                     address_details = f"{delivery_line_1} {delivery_line_2 + ' ' if delivery_line_2 else ''}{delivery_last_line}"
                     r_ser = pd.Series(address_details)
+            results = results.append(r_ser, ignore_index=True)
+        ConnectionManager(client.sender).close()
+        return results
+
+    @classmethod
+    def smartystreet_zip_code(cls, zipcode=[], invalid="INVALID", t_f=False):
+        credentials = StaticCredentials(cls.SMARTYSTREETS_AUTH_ID, cls.SMARTYSTREETS_AUTH_TOKEN)
+        client = ClientBuilder(credentials).build_us_zipcode_api_client()
+        batch = Batch()
+        results = pd.Series([], dtype="string")
+        for i, zip_code in enumerate(zipcode):
+            batch.add(ZIPCodeLookup())
+            batch[i].zipcode = zip_code
+        try:
+            client.send_batch(batch)
+        except exceptions.SmartyException as err:
+            print(err)
+            raise err
+        for i, lookup in enumerate(batch):
+            candidates = lookup.result
+            try:
+                value = candidates.zipcodes[0].zipcode
+                if t_f:
+                    value = 'TRUE'
+            except IndexError:
+                value = invalid
+                if t_f:
+                    value = 'FALSE'
+            r_ser = pd.Series([value])
             results = results.append(r_ser, ignore_index=True)
         ConnectionManager(client.sender).close()
         return results

@@ -159,4 +159,3 @@ class Profiler:
             return json.dumps(obj)
         else:
             raise Exception("Error: Object not recognized.")
-
