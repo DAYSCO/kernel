@@ -210,7 +210,7 @@ class Validation:
             return False
 
     @staticmethod
-    def email_domain_validation_TO_IMPLEMENT(domain):
+    def email_domain_validation(domain):
         if len(domain) == 0:
             return False
         try:
@@ -254,9 +254,8 @@ class Validation:
             return False
         return True
 
-
     @staticmethod
-    def email_domain_validation(domain):
+    def email_domain_validation_DEPRECATE(domain):
         if len(domain) == 0:
             return False
         try:
