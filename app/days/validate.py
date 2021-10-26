@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-
+import subprocess
 import idna
 import re
 
@@ -208,6 +208,52 @@ class Validation:
             return (s + last) % 10 == 0
         except:
             return False
+
+    @staticmethod
+    def email_domain_validation_TO_IMPLEMENT(domain):
+        if len(domain) == 0:
+            return False
+        try:
+            domain = idna.uts46_remap(domain, std3_rules=False,
+                                      transitional=False)
+        except Exception:
+            return False
+        if domain.endswith("."):
+            return False
+        if domain.startswith("."):
+            return False
+        if ".." in domain:
+            return False
+        try:
+            ascii_domain = idna.encode(domain, uts46=False).decode("ascii")
+        except idna.IDNAError:
+            return False
+        try:
+            idna.decode(ascii_domain.encode('ascii'))
+        except idna.IDNAError:
+            return False
+        domain_max_length = 255
+        if len(ascii_domain) > domain_max_length:
+            return False
+        text_hostname = r'(?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]*)?[a-zA-Z0-9])'
+        dot_atom_text = text_hostname + r'(?:\.' + text_hostname + r')*'
+        m = re.match(dot_atom_text + "\\Z", ascii_domain)
+        if not m:
+            return False
+        if "." not in ascii_domain:
+            return False
+        if not re.search(r"[A-Za-z]\Z", ascii_domain):
+            return False
+        error_pattern = re.compile(r"^ping: cannot resolve .*?: Unknown host.*")
+        ping = subprocess.Popen(
+            ["ping", "-c", "4", domain],
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE)
+        _, error = ping.communicate()
+        if re.match(error_pattern, error):
+            return False
+        return True
+
 
     @staticmethod
     def email_domain_validation(domain):
