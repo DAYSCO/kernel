@@ -1,7 +1,8 @@
+import codecs
 import logging
 
 from datetime import datetime
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response
 from app.config import Config
 from app.controllers import ActiveWorkingFiles
 from app.resources import *
@@ -58,7 +59,7 @@ def read_file_contents():
         return request_obj.return_message, request_obj.return_code
 
 
-@app_bp.route('/api/v1/table/info', methods=['PUT', 'GET'])
+@app_bp.route('/api/v1/table/info', methods=['GET'])
 def table_schema():
     logger.info(
         f"'set_table_schema' {request.method} request, {request.remote_addr}")
@@ -101,6 +102,22 @@ def perform_table_action():
         return request_obj.payload, request_obj.return_code
     else:
         return request_obj.return_message, request_obj.return_code
+
+
+@app_bp.route('/api/v1/table/content', methods=['GET'])
+def get_table_content():
+    logger.info(f"'get_table_content' POST request, {request.remote_addr}")
+    global working_files
+    request_obj = TableAction(
+        request=request,
+        working_files=working_files)
+    working_files = request_obj.working_files
+    logger.info(f"{request_obj.return_message} {request_obj.return_code}")
+    file_path = request_obj.payload.get('file_path')
+    file_data = codecs.open(file_path, 'rb').read()
+    response = make_response()
+    response.data = file_data
+    return response
 
 
 @app_bp.route('/api/v1/table/data', methods=['POST', 'DELETE'])

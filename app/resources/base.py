@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pandas as pd
 from flask_api import status
 from flask import jsonify
@@ -5,8 +7,13 @@ from flask import jsonify
 from app.days.actions import Actions
 from app.manager import Ingester
 from app.days.objects import DaysDataFrame
-from copy import deepcopy
-from app.exceptions import IDNotFoundError, PayloadError
+from app.exceptions import (
+    DuplicateNameError,
+    InvalidDataTypeError,
+    IDNotFoundError,
+    PayloadError,
+    status_codes, FileParseError
+)
 
 
 class GenericCall:
@@ -30,8 +37,12 @@ class UploadFile(GenericCall):
         self.mp_file = request.files.get('file')
         self.file_type = Ingester.identify_file(self.file_name)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
             try:
                 payload = dict(
@@ -40,18 +51,41 @@ class UploadFile(GenericCall):
                     uid=self.uid
                 )
                 if self.file_type in ['txt', 'csv', 'json', 'html']:
-                    data_frame = Ingester.mpfile_upload(
-                        mp_file=self.mp_file,
-                        file_type=self.file_type)
-                    self.working_files.add(
-                        DaysDataFrame(df=data_frame, payload=payload))
-                elif self.file_type == 'xlsx' or self.file_type == 'xls':
-                    sheet_names = pd.ExcelFile(self.mp_file).sheet_names
-                    for index, sheet_name in enumerate(sheet_names):
+                    try:
                         data_frame = Ingester.mpfile_upload(
                             mp_file=self.mp_file,
                             file_type=self.file_type,
-                            sheet_name=sheet_name)
+                            file_name=self.file_name)
+                    except FileParseError as e:
+                        self.payload = {
+                            "message": str(e),
+                            "status_code": status.HTTP_400_BAD_REQUEST,
+                            "kernel_status_code": e.status_code,
+                            "errors": [str(e)]
+                        }
+                        return
+                    self.working_files.add(
+                        DaysDataFrame(df=data_frame, payload=payload))
+                elif self.file_type == 'xlsx' or self.file_type == 'xls':
+                    try:
+                        sheet_names = pd.ExcelFile(self.mp_file).sheet_names
+                    except:
+                        raise FileParseError(self.file_name)
+                    for index, sheet_name in enumerate(sheet_names):
+                        try:
+                            data_frame = Ingester.mpfile_upload(
+                                mp_file=self.mp_file,
+                                file_type=self.file_type,
+                                sheet_name=sheet_name,
+                                file_name=self.file_name)
+                        except FileParseError as e:
+                            self.payload = {
+                                "message": str(e),
+                                "status_code": status.HTTP_400_BAD_REQUEST,
+                                "kernel_status_code": e.status_code,
+                                "errors": [str(e)]
+                            }
+                            return
                         payload.update(dict(TableName=sheet_name,
                                             sheet_index=index))
                         self.working_files.add(
@@ -61,14 +95,19 @@ class UploadFile(GenericCall):
                     "message": self.return_message,
                     "status_code": self.return_code,
                 }
-            except Exception as e:
-                self.working_files = working_files
-                self.return_message = repr(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
+            except FileParseError as e:
                 self.payload = {
-                    "message": self.return_message,
-                    "status_code": self.return_code,
-                    "errors": [self.return_message]
+                    "message": str(e),
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "kernel_status_code": e.status_code,
+                    "errors": [str(e)]
+                }
+            except Exception as e:
+                self.payload = {
+                    "message": str(e),
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "kernel_status_code": status_codes['GeneralError'],
+                    "errors": [str(e)]
                 }
 
 
@@ -76,8 +115,12 @@ class ReadFileContents(GenericCall):
     def __init__(self, request, working_files):
         super().__init__(request=request, working_files=working_files)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
             try:
                 payload = dict(
@@ -85,7 +128,18 @@ class ReadFileContents(GenericCall):
                     SizeInKb=self.file_size,
                     uid=self.uid
                 )
-                data_frame = Ingester.content_upload(self.data)
+                try:
+                    data_frame = Ingester.content_upload(
+                        contents=self.data,
+                        file_name=self.file_name)
+                except FileParseError as e:
+                    self.payload = {
+                        "message": str(e),
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "kernel_status_code": e.status_code,
+                        "errors": [str(e)]
+                    }
+                    return
                 self.working_files.add(
                     DaysDataFrame(df=data_frame, payload=payload))
                 self.payload = {
@@ -93,15 +147,12 @@ class ReadFileContents(GenericCall):
                     "message": self.return_message,
                     "status_code": self.return_code
                 }
-
             except Exception as e:
-                self.working_files = working_files
-                self.return_message = repr(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
                 self.payload = {
-                    "message": self.return_message,
-                    "status_code": self.return_code,
-                    "errors": [self.return_message]
+                    "message": str(e),
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "kernel_status_code": status_codes['GeneralError'],
+                    "errors": [str(e)]
                 }
 
 
@@ -109,50 +160,42 @@ class TableSchema(GenericCall):
     def __init__(self, request, working_files):
         super().__init__(request=request, working_files=working_files)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
-            if self.method == "PUT":
-                try:
-                    new_schema = self.json_response.get('tableSchema', [])
-                    self.working_files.update_schema(uid=self.uid,
-                                                     schema=new_schema)
-                except IDNotFoundError as e:
-                    self.working_files = working_files
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                except Exception as e:
-                    self.working_files = working_files
-                    self.return_message = repr(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    raise e
-            elif self.method == "GET":
-                try:
-                    self.payload = jsonify(self.working_files[self.uid].schema)
-                except IDNotFoundError as e:
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    self.payload = {
-                        'errors': self.return_code,
-                        'status_code': self.return_code,
-                        'message': self.return_message
-                    }
-                except Exception as e:
-                    self.return_message = repr(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    self.payload = {
-                        'errors': self.return_code,
-                        'status_code': self.return_code,
-                        'message': self.return_message
-                    }
+            try:
+                self.payload = jsonify(self.working_files[self.uid].schema)
+            except IDNotFoundError as e:
+                self.payload = {
+                    "message": str(e),
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "kernel_status_code": e.status_code,
+                    "errors": [str(e)]
+                }
+                return
+            except Exception as e:
+                self.payload = {
+                    "message": str(e),
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "kernel_status_code": status_codes['GeneralError'],
+                    "errors": [str(e)]
+                }
 
 
 class TableData(GenericCall):
     def __init__(self, request, working_files):
         super().__init__(request=request, working_files=working_files)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
             if self.method == "POST":
                 try:
@@ -160,62 +203,76 @@ class TableData(GenericCall):
                         row_count=int(self.json_response['rowCount']),
                         start=int(self.json_response['startIndex'])
                     )
-                except IDNotFoundError as e:
-                    self.payload = None
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                except PayloadError as e:
-                    self.payload = None
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
+                except (IDNotFoundError, PayloadError) as e:
+                    self.payload = {
+                        "message": str(e),
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "kernel_status_code": e.status_code,
+                        "errors": [str(e)]
+                    }
+                    return
                 except Exception as e:
-                    self.payload = None
-                    self.return_message = repr(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    raise e
+                    self.payload = {
+                        "message": str(e),
+                        "status_code": status.HTTP_404_NOT_FOUND,
+                        "kernel_status_code": status_codes['GeneralError'],
+                        "errors": [str(e)]
+                    }
             elif self.method == "DELETE":
                 try:
                     self.working_files.remove(self.uid)
                 except IDNotFoundError as e:
-                    self.working_files = working_files
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        "message": str(e),
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "kernel_status_code": e.status_code,
+                        "errors": [str(e)]
+                    }
+                    return
                 except Exception as e:
-                    self.working_files = working_files
-                    self.return_message = repr(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
+                    self.payload = {
+                        "message": str(e),
+                        "status_code": status.HTTP_404_NOT_FOUND,
+                        "kernel_status_code": status_codes['GeneralError'],
+                        "errors": [str(e)]
+                    }
 
 
 class ColumnAction(GenericCall):
     def __init__(self, request, working_files):
         super().__init__(request=request, working_files=working_files)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
             try:
                 ddf = deepcopy(self.working_files[self.uid])
                 ddf, payload_res = Actions.execute(
                     ddf=ddf,
                     payload=self.json_response)
-            except Exception as e:
-                self.return_message = str(e)
-                self.return_code = status.HTTP_400_BAD_REQUEST
+            except (PayloadError,
+                    InvalidDataTypeError,
+                    DuplicateNameError,
+                    IDNotFoundError) as e:
                 self.payload = {
-                    "message": self.return_message,
-                    "status_code": self.return_code,
-                    "errors": [self.return_message]
+                    "message": str(e),
+                    "errors": [str(e)],
+                    'status_code': status.HTTP_400_BAD_REQUEST,
+                    'kernel_status_code': e.status_code
                 }
                 return
-            errors = payload_res.get('errors')
-            if len(errors):
-                self.return_message = str(errors[-1])
-                self.return_code = status.HTTP_400_BAD_REQUEST
+            except Exception as e:
                 self.payload = {
-                    "message": self.return_message,
-                    "status_code": errors[-1],
-                    "errors": errors
+                    "message": str(e),
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "kernel_status_code": status_codes['GeneralError'],
+                    "errors": [str(e)]
                 }
+                return
 
             new_columns = payload_res.get('new_columns')
             action = payload_res.get('action')
@@ -233,26 +290,30 @@ class TableAction(GenericCall):
     def __init__(self, request, working_files, action=None):
         super().__init__(request=request, working_files=working_files)
         if not self.uid:
-            self.return_message = "id missing from headers request"
-            self.return_code = status.HTTP_400_BAD_REQUEST
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
         else:
             if action == 'undo':
-                if len(self.working_files[self.uid].action_sequence) == 0:
+                try:
+                    action_sequence = self.working_files[self.uid].action_sequence
+                except IDNotFoundError as e:
+                    self.payload = {
+                        "message": str(e),
+                        "errors": [str(e)],
+                        'status_code': status.HTTP_400_BAD_REQUEST,
+                        'kernel_status_code': e.status_code
+                    }
+                    return
+                if len(action_sequence) == 0:
                     return
                 ddf = deepcopy(self.working_files[self.uid])
                 ddf, payload_res = Actions.execute(
                     ddf=ddf,
                     payload={'action': action})
-                errors = payload_res.get('errors')
-                if len(errors):
-                    self.return_message = str(errors[-1])
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    self.payload = {
-                        "message": self.return_message,
-                        "status_code": self.return_code,
-                        "errors": errors
-                    }
-                    return
 
                 self.working_files.add(ddf)
                 ddf.update_action_sequence()
@@ -266,22 +327,11 @@ class TableAction(GenericCall):
                         ddf=self.working_files[self.uid],
                         payload=self.json_response)
                 except Exception as e:
-                    self.return_message = str(e)
-                    self.return_code = status.HTTP_400_BAD_REQUEST
                     self.payload = {
-                        "message": self.return_message,
-                        "status_code": self.return_code,
+                        "message": str(e),
+                        "status_code": status.HTTP_404_NOT_FOUND,
+                        "kernel_status_code": status_codes['GeneralError'],
                         "errors": [str(e)]
-                    }
-                    return
-                errors = payload_res.get('errors')
-                if len(errors):
-                    self.return_message = str(errors[-1])
-                    self.return_code = status.HTTP_400_BAD_REQUEST
-                    self.payload = {
-                        "message": self.return_message,
-                        "status_code": self.return_code,
-                        "errors": errors
                     }
                     return
                 self.payload = {

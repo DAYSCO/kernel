@@ -3,7 +3,8 @@ class ConnectionManager:
         self.obj = obj
 
     def close(self):
-        if "close" in [method_name for method_name in dir(self.obj) if callable(getattr(self.obj, method_name))]:
+        if "close" in [method_name for method_name in dir(self.obj)
+                       if callable(getattr(self.obj, method_name))]:
             self.obj.close()
         elif "inner" in vars(self.obj):
             ConnectionManager(self.obj.inner).close()

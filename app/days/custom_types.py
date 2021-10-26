@@ -11,13 +11,13 @@ class LastName(str):
 
 
 class FullName(str):
-    '''
+    """
     raw = "Rev. Dr. Martin Luther King Jr."
     prefixes = ["Rev.", "Dr."]
     given_names = ["Martin", "Luther"]
     family_name = "King"
     suffixes = ["Jr."]
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -28,10 +28,10 @@ class FullName(str):
 
 
 class Boolean(str):
-    '''
+    """
     raw = "TRUE"
     bool_value = True
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -39,7 +39,7 @@ class Boolean(str):
 
 
 class StreetAddress(str):
-    '''
+    """
     raw = ""
     urbanization = None
     primary_number = None
@@ -53,7 +53,7 @@ class StreetAddress(str):
     extra_secondary_designator = None
     pmb_designator = None
     pmb_number = None
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -72,7 +72,7 @@ class StreetAddress(str):
 
 
 class FullAddress(str):
-    '''
+    """
     raw = ""
     input_id = None
     input_index = None
@@ -119,7 +119,7 @@ class FullAddress(str):
     time_zone = None
     utc_offset = None
     dst = None
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -195,11 +195,11 @@ class Country(str):
 
 
 class Email(str):
-    '''
+    """
     raw = "name123@gmail.com"
     local_part = "name123"
     domain = "gmail.com"
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -227,11 +227,11 @@ class Integer(str):
 
 
 class IPAddress(str):
-    '''
+    """
     raw = "101.010.01.01"
     network_part = "101.010"
     host_part = "01.01"
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -246,13 +246,13 @@ class Number(str):
 
 
 class PhoneNumber(str):
-    '''
+    """
     raw = "+1 (123) 456 7890"
     country_code = "1"
     area_code = "123"
     exchange = "456"
     line_number = "7890"
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -269,10 +269,10 @@ class String(str):
 
 
 class CCNumber(str):
-    '''
+    """
     raw = "378282246310005"
     provider = "American Express"
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -280,12 +280,12 @@ class CCNumber(str):
 
 
 class SSNumber(str):
-    '''
+    """
     raw = "123-45-6789"
     area_number = "123"
     group_number = "45"
     serial_number = "6789"
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -295,7 +295,7 @@ class SSNumber(str):
 
 
 class Datetime(str):
-    '''
+    """
     raw = "12/31/2001 00:00:00000"
     weekday = "Monday"
     weekday_abbrev = "Mon"
@@ -314,7 +314,7 @@ class Datetime(str):
     microsecond = "000000"
     utc_offset = "+0000"
     timezone = None
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.VALIDATION_META = {"valid": None, "errors": list()}
@@ -338,8 +338,8 @@ class Datetime(str):
 
 
 class Patterns:
-    BOOLEAN = [ r"^(true|t|1)$", r"^(false|f|0)$" ]
-    BOOLEAN_VALUES = [ True, False ]
+    BOOLEAN = [r"^(true|t|1)$", r"^(false|f|0)$" ]
+    BOOLEAN_VALUES = [True, False]
     CCNUMBER = [
         r"^4[0-9]{12}(?:[0-9]{3})?$",
         r"^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$",
@@ -353,17 +353,17 @@ class Patterns:
         "American Express",
         "Discover",
         "Diners Club",
-        "JCB" ]
-    EMAIL = [ r"^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*$" ]
-    GENDER = [ r"^(male|m)$", r"^(female|f)$", r"^(other|o|unknown|u)$" ]
+        "JCB"]
+    EMAIL = [r"^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*$"]
+    GENDER = [r"^(male|m)$", r"^(female|f)$", r"^(other|o|unknown|u)$"]
     GENDER_VALUES = [
         "MALE",
         "FEMALE",
-        "OTHER/UNKNOWN" ]
-    INTEGER = [ r"^\d*$" ]
-    IPADDRESS = [ r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" ]
-    NUMBER = [ r"^\(?-?(\d{1,3},?(\d{3},?)*)?\.?\d*\)?$" ]
-    PHONENUMBER = [ r"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$" ]
-    SSNUMBER = [ r"^\d{3}-?\d{2}-?\d{4}$" ]
-    STREETADDRESS = [ r"^(#?\d+-?\d*|ap|p\.?o\.?)(#?\d*(\.|,)? ?|[-a-z]*(\.|,)? ?)*$" ]
-    ZIP = [ r"^\d{5}(-\d{4})?$|^\d{5}(-\d{4})?$" ]
+        "OTHER/UNKNOWN"]
+    INTEGER = [r"^\d*$"]
+    IPADDRESS = [r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"]
+    NUMBER = [r"^\(?-?(\d{1,3},?(\d{3},?)*)?\.?\d*\)?$"]
+    PHONENUMBER = [r"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"]
+    SSNUMBER = [r"^\d{3}-?\d{2}-?\d{4}$"]
+    STREETADDRESS = [r"^(#?\d+-?\d*|ap|p\.?o\.?)(#?\d*(\.|,)? ?|[-a-z]*(\.|,)? ?)*$"]
+    ZIP = [r"^\d{5}(-\d{4})?$|^\d{5}(-\d{4})?$"]

@@ -111,7 +111,8 @@ class Validation:
         else:
             new_val = SSNumber(invalid)
             new_val.VALIDATION_META['valid'] = False
-            new_val.VALIDATION_META['errors'].append("Value could not be parsed.")
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
             return new_val
 
     @classmethod
@@ -121,7 +122,8 @@ class Validation:
         except:
             new_val = Datetime(invalid)
             new_val.VALIDATION_META['valid'] = False
-            new_val.VALIDATION_META['errors'].append("Value could not be parsed.")
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
             return new_val
         val.VALIDATION_META['valid'] = True
         val.weekday = p_val.strftime("%A")
@@ -154,7 +156,8 @@ class Validation:
         else:
             new_val = IPAddress(invalid)
             new_val.VALIDATION_META['valid'] = False
-            new_val.VALIDATION_META['errors'].append("Value could not be parsed.")
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
             return new_val
 
     @classmethod
@@ -171,7 +174,8 @@ class Validation:
         else:
             new_val = PhoneNumber(invalid)
             new_val.VALIDATION_META['valid'] = False
-            new_val.VALIDATION_META['errors'].append("Value could not be parsed.")
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
             return new_val
 
     @classmethod
@@ -191,7 +195,8 @@ class Validation:
         else:
             new_val = Email(invalid)
             new_val.VALIDATION_META['valid'] = False
-            new_val.VALIDATION_META['errors'].append("Value could not be parsed.")
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
             return new_val
         return val
 

@@ -1,4 +1,4 @@
-from .base import Ingester, Exporter
+from .base import Ingester
 
 
 name = "file_ingest"

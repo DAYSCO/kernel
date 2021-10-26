@@ -273,6 +273,20 @@
             ]
         }
     },
+    "test_7c_insert_string": {
+        "payload": {
+            "action": "insertString",
+            "inputParams": [
+                {
+                    "indexes": [
+                        0
+                    ],
+                    "insertIndex": 2,
+                    "insertString": "FooBar"
+                }
+            ]
+        }
+    },
     "test_8_uppercase": {
         "payload": {
             "action": "upperCase",
@@ -292,7 +306,7 @@
             "inputParams": [
                 {
                     "indexes": [
-                        11
+                        12
                     ],
                     "datetimeFormat": "%d-%m-%Y"
                 }
@@ -1010,6 +1024,12 @@
                 "2": "Arron",
                 "3": "Sibylle"
             },
+            "first_name_updated": {
+                "0": "MiFooBarchael",
+                "1": "JoFooBar",
+                "2": "ArFooBarron",
+                "3": "SiFooBarbylle"
+            },
             "gender": {
                 "0": "Male",
                 "1": "TE",
@@ -1068,6 +1088,12 @@
                     "showIndex": true
                 }
             ]
+        }
+    },
+    "test_94_export_content": {
+        "file_path": "tests/output.csv",
+        "payload": {
+            "action": "export"
         }
     }
 }
