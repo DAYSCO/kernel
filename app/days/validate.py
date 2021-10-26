@@ -214,18 +214,18 @@ class Validation:
         if len(domain) == 0:
             return False
         try:
-            domain = idna.uts46_remap(domain, std3_rules=False,
+            _domain = idna.uts46_remap(domain, std3_rules=False,
                                       transitional=False)
         except Exception:
             return False
-        if domain.endswith("."):
+        if _domain.endswith("."):
             return False
-        if domain.startswith("."):
+        if _domain.startswith("."):
             return False
-        if ".." in domain:
+        if ".." in _domain:
             return False
         try:
-            ascii_domain = idna.encode(domain, uts46=False).decode("ascii")
+            ascii_domain = idna.encode(_domain, uts46=False).decode("ascii")
         except idna.IDNAError:
             return False
         try:
@@ -250,7 +250,7 @@ class Validation:
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE)
         _, error = ping.communicate()
-        if re.match(error_pattern, error):
+        if re.match(error_pattern, str(error.decode('utf-8'))):
             return False
         return True
 
