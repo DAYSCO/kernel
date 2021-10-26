@@ -251,7 +251,7 @@ class Validation:
             return False
         error_pattern = re.compile(r"^ping: cannot resolve .*?: Unknown host.*")
         ping = subprocess.Popen(
-            ["ping", "-c", "4", domain],
+            ["ping", "-c", "1", domain],
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE)
         _, error = ping.communicate()
