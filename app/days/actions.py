@@ -3,14 +3,14 @@ import sys
 
 import pandas as pd
 
-from app.exceptions import PayloadError
+from app.exceptions import PayloadError, MissingPayloadValueError
 
 
 class Actions:
 
     @classmethod
     def execute(cls, ddf, payload):
-        action = payload['action']
+        action = payload.get('action', '')
         indexes = list()
         _df = pd.DataFrame()
 
@@ -59,6 +59,11 @@ class Actions:
                 ddf=ddf,
                 payload=payload,
                 indexes=indexes)
+        elif action == "insertString":
+            ddf, payload_res = cls.insert_string(
+                ddf=ddf,
+                payload=payload,
+                indexes=indexes)
         elif action == "validate":
             ddf, payload_res = cls.validate(
                 ddf=ddf,
@@ -88,7 +93,7 @@ class Actions:
             ids = [ddf[index].id for index in indexes]
 
         if not ids:
-            raise ValueError("Need either ids or indexes")
+            raise MissingPayloadValueError('indexes')
 
         try:
             valid_types = payload['inputParams'][0]['validType']
@@ -99,36 +104,24 @@ class Actions:
 
         payload_res = dict()
         new_columns = list()
-        errors = list()
         for _index, _id in enumerate(ids):
             valid_type = valid_types[_index]
             if legacy:
-                try:
-                    new_name = f"{ddf[_id].display_name}_validate"
-                    new_index = ddf[_id].index + 1
-                    series = ddf[_id].series
-                    new_name, status_code = ddf.new_column_name(new_name)
-                    if status_code is None:
-                        series.name = new_name
-                    else:
-                        errors.append(status_code)
-                        break
-                    new_index = ddf.new_column(series=series,
-                                               index=new_index)
-                    ddf[new_index].validate(custom_type=valid_type,
-                                            legacy=False)
-                    new_columns.append(new_index)
-                except Exception as e:
-                    errors.append(repr(e))
+                new_name = f"{ddf[_id].display_name}_validate"
+                new_index = ddf[_id].index + 1
+                series = ddf[_id].series
+                new_name = ddf.new_column_name(new_name)
+                series.name = new_name
+                new_index = ddf.new_column(series=series,
+                                           index=new_index)
+                ddf[new_index].validate(custom_type=valid_type,
+                                        legacy=False)
+                new_columns.append(new_index)
             else:
-                try:
-                    ddf[_id].validate(custom_type=valid_type, legacy=False)
-                except Exception as e:
-                    errors.append(repr(e))
+                ddf[_id].validate(custom_type=valid_type, legacy=False)
 
         payload['newColumns'] = new_columns
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
         return ddf, payload_res
 
@@ -136,16 +129,11 @@ class Actions:
     def combine(cls, ddf, payload, ids=None, indexes=None):
         params = payload.get('inputParams', [{}])[0]
         try:
-            join_char = params.get('joinChar', " ")
+            join_char = params['joinChar']
         except:
             raise PayloadError("joinChar", "None")
-        try:
-            keep_original = params.get('keepOriginal', True)
-        except:
-            raise PayloadError("keepOriginal", "None")
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
 
         if ids:
@@ -153,46 +141,37 @@ class Actions:
         elif indexes:
             pass
         else:
-            errors.append(repr(ValueError("Need either ids or indexes")))
+            raise MissingPayloadValueError('indexes')
 
         new_index = max(indexes) + 1
-        try:
-            first = True
-            new_name = []
-            new_series = pd.Series(["" for _ in range(ddf.row_count)])
+        first = True
+        new_name = []
+        new_series = pd.Series(["" for _ in range(ddf.row_count)])
 
-            for index in indexes:
-                if first:
-                    join_by = ""
-                else:
-                    join_by = join_char
-                new_series = new_series.str.cat(ddf[index].series,
-                                                sep=join_by, na_rep='')
-                first = False
-                new_name.append(ddf[index].name)
-
-            new_name.append("concatenate")
-            new_name = "_".join(new_name)
-            new_name, status_code = ddf.new_column_name(new_name)
-            if status_code is None:
-                new_series.name = new_name
-                i = ddf.new_column(series=new_series, index=new_index)
-                new_columns.append(i)
+        for index in indexes:
+            if first:
+                join_by = ""
             else:
-                errors.append(status_code)
-        except Exception as e:
-            errors.append(repr(e))
+                join_by = join_char
+            new_series = new_series.str.cat(ddf[index].series,
+                                            sep=join_by, na_rep='')
+            first = False
+            new_name.append(ddf[index].name)
 
+        new_name.append("concatenate")
+        new_name = "_".join(new_name)
+        new_name = ddf.new_column_name(new_name)
+        new_series.name = new_name
+        i = ddf.new_column(series=new_series, index=new_index)
+        new_columns.append(i)
+
+        keep_original = params.get('keepOriginal', True)
         if not keep_original:
-            try:
-                for index in indexes:
-                    ddf[index].visible = False
-            except Exception as e:
-                errors.append(repr(e))
+            for index in indexes:
+                ddf[index].visible = False
 
         payload['newColumns'] = new_columns
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
         return ddf, payload_res
 
@@ -201,46 +180,34 @@ class Actions:
         if indexes:
             ids = [ddf[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         action = payload['action']
         params = payload.get('inputParams', [{}])[0]
 
-        try:
-            keep_original = params.get('keepOriginal', True)
-        except:
-            raise PayloadError("keepOriginal", "None")
+        keep_original = params.get('keepOriginal', True)
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
 
         for _id in ids:
-            try:
-                new_name = f"{ddf[_id].display_name}_{action}"
-                new_index = ddf[_id].index + 1
-                series = ddf[_id].series
-                new_name, status_code = ddf.new_column_name(new_name)
-                if status_code is None:
-                    series.name = new_name
-                else:
-                    errors.append(status_code)
-                    break
-                new_index = ddf.new_column(series=series,
-                                           index=new_index)
-                ddf[new_index].format(casing=action)
-                new_columns.append(new_index)
-            except Exception as e:
-                errors.append(repr(e))
+            new_name = f"{ddf[_id].display_name}_{action}"
+            new_index = ddf[_id].index + 1
+            series = ddf[_id].series
+            new_name = ddf.new_column_name(new_name)
+            series.name = new_name
+            new_index = ddf.new_column(series=series,
+                                       index=new_index)
+            ddf[new_index].format(casing=action)
+            new_columns.append(new_index)
 
         if not keep_original:
-            try:
-                for _id in ids:
-                    ddf[_id].visible = False
-            except Exception as e:
-                errors.append(repr(e))
+            for _id in ids:
+                ddf[_id].visible = False
 
         payload['newColumns'] = new_columns
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
         return ddf, payload_res
 
@@ -249,12 +216,12 @@ class Actions:
         if indexes:
             ids = [ddf[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         params = payload.get('inputParams', [{}])[0]
 
-        try:
-            keep_original = params.get('keepOriginal', True)
-        except:
-            raise PayloadError("keepOriginal", "None")
+        keep_original = params.get('keepOriginal', True)
 
         try:
             new_datetime_format = params['datetimeFormat']
@@ -262,37 +229,25 @@ class Actions:
             raise PayloadError("datetimeFormat", "None")
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
 
         for _id in ids:
-            try:
-                new_name = f"{ddf[_id].display_name}_date_format"
-                new_index = ddf[_id].index + 1
-                series = ddf[_id].series
-                new_name, status_code = ddf.new_column_name(new_name)
-                if status_code is None:
-                    series.name = new_name
-                else:
-                    errors.append(status_code)
-                    break
-                new_index = ddf.new_column(series=series,
-                                           index=new_index)
-                ddf[new_index].date_format(date_format=new_datetime_format)
-                new_columns.append(new_index)
-            except Exception as e:
-                errors.append(repr(e))
+            new_name = f"{ddf[_id].display_name}_date_format"
+            new_index = ddf[_id].index + 1
+            series = ddf[_id].series
+            new_name = ddf.new_column_name(new_name)
+            series.name = new_name
+            new_index = ddf.new_column(series=series,
+                                       index=new_index)
+            ddf[new_index].date_format(date_format=new_datetime_format)
+            new_columns.append(new_index)
 
         if not keep_original:
-            try:
-                for _id in ids:
-                    ddf[_id].visible = False
-            except Exception as e:
-                errors.append(repr(e))
+            for _id in ids:
+                ddf[_id].visible = False
 
         payload['newColumns'] = new_columns
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
         return ddf, payload_res
 
@@ -300,6 +255,9 @@ class Actions:
     def substitute(cls, ddf, payload, ids=None, indexes=None):
         if indexes:
             ids = [ddf[index].id for index in indexes]
+
+        if not ids:
+            raise MissingPayloadValueError('indexes')
 
         params = payload.get('inputParams', [{}])[0]
         try:
@@ -312,44 +270,75 @@ class Actions:
         except:
             raise PayloadError("replaceStr", "None")
 
-        try:
-            keep_original = params.get('keepOriginal', True)
-        except:
-            raise PayloadError("keepOriginal", "None")
+        keep_original = params.get('keepOriginal', True)
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
 
         for _id in ids:
-            try:
-                new_name = f"{ddf[_id].display_name}_substitute"
-                new_index = ddf[_id].index + 1
-                series = ddf[_id].series
-                new_name, status_code = ddf.new_column_name(new_name)
-                if status_code is None:
-                    series.name = new_name
-                else:
-                    errors.append(status_code)
-                    break
-                new_index = ddf.new_column(series=series,
-                                           index=new_index)
-                ddf[new_index].substitute(match_str=match_str,
-                                          replace_str=replace_str)
-                new_columns.append(new_index)
-            except Exception as e:
-                errors.append(repr(e))
+            new_name = f"{ddf[_id].display_name}_substitute"
+            new_index = ddf[_id].index + 1
+            series = ddf[_id].series
+            new_name= ddf.new_column_name(new_name)
+            series.name = new_name
+            new_index = ddf.new_column(series=series,
+                                       index=new_index)
+            ddf[new_index].substitute(match_str=match_str,
+                                      replace_str=replace_str)
+            new_columns.append(new_index)
 
         if not keep_original:
-            try:
-                for _id in ids:
-                    ddf[_id].visible = False
-            except Exception as e:
-                errors.append(repr(e))
+            for _id in ids:
+                ddf[_id].visible = False
 
         payload['newColumns'] = new_columns
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
+                            "new_columns": new_columns})
+
+        return ddf, payload_res
+
+    @classmethod
+    def insert_string(cls, ddf, payload, ids=None, indexes=None):
+        if indexes:
+            ids = [ddf[index].id for index in indexes]
+
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
+        params = payload.get('inputParams', [{}])[0]
+        try:
+            insert_str = params['insertString']
+        except:
+            raise PayloadError("insertString", "None")
+
+        try:
+            insert_index = params['insertIndex']
+        except:
+            raise PayloadError("insertIndex", "None")
+
+        keep_original = params.get('keepOriginal', True)
+
+        payload_res = dict()
+        new_columns = list()
+
+        for _id in ids:
+            new_name = f"{ddf[_id].display_name}_updated"
+            new_index = ddf[_id].index + 1
+            series = ddf[_id].series
+            new_name = ddf.new_column_name(new_name)
+            series.name = new_name
+            new_index = ddf.new_column(series=series,
+                                       index=new_index)
+            ddf[new_index].insert_string(insert_str=insert_str,
+                                         insert_index=insert_index)
+            new_columns.append(new_index)
+
+        if not keep_original:
+            for _id in ids:
+                ddf[_id].visible = False
+
+        payload['newColumns'] = new_columns
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
 
         return ddf, payload_res
@@ -359,18 +348,16 @@ class Actions:
         if indexes:
             ids = [ddf[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         payload_res = dict()
-        errors = list()
         new_columns = list()
 
-        try:
-            for _id in ids:
-                ddf[_id].update_visibility(False)
-        except Exception as e:
-            errors.append(repr(e))
+        for _id in ids:
+            ddf[_id].update_visibility(False)
 
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
 
         return ddf, payload_res
@@ -380,27 +367,25 @@ class Actions:
         if indexes:
             ids = [ddf[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         params = payload.get('inputParams', [{}])[0]
         try:
-            display_names = params.get('displayNames', " ")
+            display_names = params['displayNames']
         except:
             raise PayloadError("displayNames", "None")
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
         schema = list()
 
-        try:
-            for _id, display_name in zip(ids, display_names):
-                schema.append(ddf[_id].column_schema)
-                ddf[_id].change_display_name(display_name)
-        except Exception as e:
-            errors.append(repr(e))
+        for _id, display_name in zip(ids, display_names):
+            schema.append(ddf[_id].column_schema)
+            ddf[_id].change_display_name(display_name)
 
         payload['schema'] = schema
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
 
         return ddf, payload_res
@@ -410,6 +395,9 @@ class Actions:
         if indexes:
             ids = [ddf[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         params = payload.get('inputParams', [{}])[0]
 
         try:
@@ -418,20 +406,15 @@ class Actions:
             raise PayloadError("newType", "None")
 
         payload_res = dict()
-        errors = list()
         new_columns = list()
         schema = list()
 
-        try:
-            for _id, new_type in zip(ids, new_types):
-                schema.append(ddf[_id].column_schema)
-                ddf[_id].update_custom_type(new_custom_type=new_type)
-        except Exception as e:
-            errors.append(repr(e))
+        for _id, new_type in zip(ids, new_types):
+            schema.append(ddf[_id].column_schema)
+            ddf[_id].update_custom_type(new_custom_type=new_type)
 
         payload['schema'] = schema
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": new_columns})
         return ddf, payload_res
 
@@ -445,12 +428,15 @@ class Actions:
             except:
                 ids = [ddf._columns[index].id for index in indexes]
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         action = payload['action']
         payload_res = dict()
-        errors = list()
 
         if action in ["upperCase", "lowerCase", "camelCase", "substitute",
-                      "validate", "formatDateTime", "concatenate"]:
+                      "validate", "formatDateTime", "concatenate",
+                      "insertString"]:
             remove_ids = [ddf[index].id for index in payload['newColumns']]
 
             for _id in remove_ids:
@@ -481,15 +467,11 @@ class Actions:
             _id = ddf[indexes].id
             old_value = payload.get('oldValue')
             row_index = payload['inputParams'][0].get('targetRowIndex')
-            try:
-                ddf[_id].update_value(
-                    row_index=row_index,
-                    new_value=old_value)
-            except Exception as e:
-                errors.append(repr(e))
+            ddf[_id].update_value(
+                row_index=row_index,
+                new_value=old_value)
 
-        payload_res.update({"errors": errors,
-                            "action": payload})
+        payload_res.update({"action": payload})
 
         return ddf, payload_res
 
@@ -507,7 +489,6 @@ class Actions:
             show_index = False
 
         payload_res = dict()
-        errors = list()
 
         PLATFORM = sys.platform
         if PLATFORM in ['win32', 'cygwin', 'msys']:
@@ -523,16 +504,13 @@ class Actions:
             pass
 
         file_path = f"{base_dir}{spl}"
-        try:
-            if file_format == 'csv':
-                file_path = ddf.to_csv(destination=file_path,
-                                       show_index=show_index)
-        except Exception as e:
-            errors.append(e)
+
+        if file_format == 'csv':
+            file_path = ddf.to_csv(destination=file_path,
+                                   show_index=show_index)
 
         payload_res.update({
-            "file_path": file_path,
-            "errors": errors})
+            "file_path": file_path})
         return ddf, payload_res
 
     @classmethod
@@ -540,31 +518,28 @@ class Actions:
         if index is not None:
             ids = ddf[index].id
 
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
         params = payload.get('inputParams', [{}])[0]
         try:
-            row_index = params.get('targetRowIndex', " ")
+            row_index = params['targetRowIndex']
         except:
             raise PayloadError("targetRowIndex", "None")
 
         try:
-            new_value = params.get('newValue', "")
+            new_value = params['newValue']
         except:
             raise PayloadError("newValue", "None")
 
         payload_res = dict()
-        errors = list()
-        old_value = ''
 
-        try:
-            old_value = ddf[ids].update_value(
-                row_index=row_index,
-                new_value=new_value)
-        except Exception as e:
-            errors.append(repr(e))
+        old_value = ddf[ids].update_value(
+            row_index=row_index,
+            new_value=new_value)
 
         payload['oldValue'] = old_value
-        payload_res.update({"errors": errors,
-                            "action": payload,
+        payload_res.update({"action": payload,
                             "new_columns": []})
 
         return ddf, payload_res

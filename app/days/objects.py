@@ -4,7 +4,7 @@ from dateutil.parser import parse
 
 from .suggest import Suggestion
 from .validate import Validation
-from ..exceptions import PayloadError, InvalidDataTypeError
+from ..exceptions import PayloadError, InvalidDataTypeError, DuplicateNameError
 
 
 class DaysDataFrame:
@@ -22,12 +22,12 @@ class DaysDataFrame:
         self.action_sequence = list()
 
     @property
-    def columns(self, all_data=False):
+    def columns(self):
         cols = list()
         for x in self._columns:
             if x.visible:
                 cols.append(x)
-        return sorted(cols, key=lambda x: x.index)
+        return sorted(cols, key=lambda value: value.index)
 
     @property
     def all_columns(self):
@@ -132,7 +132,6 @@ class DaysDataFrame:
         self._columns.pop(index)
 
     def new_column_name(self, name):
-        status_code = None
         column_names = set(x.name for x in self.columns)
         column_names.update(set(x.display_name for x in self.columns))
         new_name = name
@@ -143,9 +142,9 @@ class DaysDataFrame:
             else:
                 break
         else:
-            status_code = 101
+            raise DuplicateNameError(name)
 
-        return new_name, status_code
+        return new_name
 
 
 class DaysSeries:
@@ -261,3 +260,17 @@ class DaysSeries:
             self.custom_type = new_custom_type
         else:
             raise InvalidDataTypeError(self.display_name, new_custom_type)
+
+    def insert_string(self, insert_str, insert_index):
+        self.series = pd.Series(
+            [self.insert_string_value(value, insert_str, insert_index)
+             for value in self.series])
+
+    @classmethod
+    def insert_string_value(cls, value, insert_str, insert_index):
+        if insert_index == 0:
+            return insert_str + value
+        elif insert_index == -1:
+            return value + insert_str
+        else:
+            return value[:insert_index] + insert_str + value[insert_index:]
