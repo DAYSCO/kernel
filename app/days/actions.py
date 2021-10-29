@@ -375,13 +375,13 @@ class Actions:
             display_names = params['displayNames']
         except:
             raise PayloadError("displayNames", "None")
-
         payload_res = dict()
         new_columns = list()
         schema = list()
 
         for _id, display_name in zip(ids, display_names):
             schema.append(ddf[_id].column_schema)
+            display_name = ddf.new_column_name(name=display_name, limit=2)
             ddf[_id].change_display_name(display_name)
 
         payload['schema'] = schema
