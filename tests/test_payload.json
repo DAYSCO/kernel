@@ -952,6 +952,12 @@
                 "2": "2 test",
                 "3": "01312 Spohn Way"
             },
+            "address_city_state_zipcode_concatenate": {
+                "0": "8 Stone Place Somerville Massachusetts 02143",
+                "1": "06 test Pass test test 12345",
+                "2": "2 test test Texas 12345",
+                "3": "01312 Spohn Way Panama City Florida 12345"
+            },
             "cc_number": {
                 "0": "378282246310005",
                 "1": "371449635398431",

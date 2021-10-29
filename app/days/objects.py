@@ -17,7 +17,8 @@ class DaysDataFrame:
         if payload.get('sheet_index'):
             sheet_index = payload.get('sheet_index', None)
             self.uid = f"{self.uid}#{sheet_index}" if sheet_index else self.uid
-        self.name = payload.get('TableName', "Undefined")
+        self.name = payload.get('FileName', "Undefined")
+        self.table_name = payload.get('TableName', "Undefined")
         self.size = payload.get('SizeInKb', 0)
         self.action_sequence = list()
 
@@ -65,7 +66,8 @@ class DaysDataFrame:
     @property
     def schema(self):
         return {
-            "TableName": self.name,
+            "FileName": self.name,
+            "TableName": self.table_name,
             "ColumnCount": self.column_count,
             "RowCount": self.row_count,
             "SizeInKb": self.size,
@@ -87,7 +89,7 @@ class DaysDataFrame:
 
     def to_json(self, row_count=None, start=0, value_only=True):
         data = dict([(x.to_json(row_count, start, value_only=value_only))
-                     for x in self.columns])
+                     for x in self.all_columns])
         return data
 
     def to_excel(self, destination=None):
@@ -131,11 +133,10 @@ class DaysDataFrame:
                 self._columns[i].index -= 1
         self._columns.pop(index)
 
-    def new_column_name(self, name):
+    def new_column_name(self, name, limit=10):
         column_names = set(x.name for x in self.columns)
         column_names.update(set(x.display_name for x in self.columns))
         new_name = name
-        limit = 10
         for i in range(1, limit):
             if new_name in column_names:
                 new_name = f"{name}__{i}"

@@ -47,6 +47,7 @@ class UploadFile(GenericCall):
             try:
                 payload = dict(
                     TableName=self.file_name,
+                    FileName=self.file_name,
                     SizeInKb=self.file_size,
                     uid=self.uid
                 )
