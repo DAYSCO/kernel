@@ -1,3 +1,4 @@
+import csv
 import os
 import pandas as pd
 import subprocess
@@ -12,7 +13,12 @@ from smartystreets_python_sdk.us_zipcode import Lookup as ZIPCodeLookup
 from dateutil.parser import parse
 from .custom_types import *
 from app.util import ConnectionManager
+from app.config.config import Config
 
+DATA_PATH = os.environ.get("DATA_PATH", Config.DATA_PATH)
+DOMAIN_DATA_FILE_PATH = f"{DATA_PATH}/valid_domains.csv"
+DOMAINS_DATA = set(pd.read_csv(DOMAIN_DATA_FILE_PATH, header=None)
+                   [0].apply(lambda x: re.sub(r"(\s|\|-|')", "", x.lower())))
 
 class Validation:
 
@@ -30,6 +36,9 @@ class Validation:
             series = cls.full_address(series, invalid=invalid)
         elif custom_type == "EMAIL":
             series = series.apply(cls.email, invalid=invalid)
+            with open(DOMAIN_DATA_FILE_PATH, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(zip(sorted(DOMAINS_DATA)))
         elif custom_type == "GENDER":
             series = series.apply(cls.gender, invalid=invalid)
         elif custom_type == "IPADDRESS":
@@ -182,7 +191,12 @@ class Validation:
     def email(cls, val, invalid="INVALID"):
         if cls.pattern_match(val, re.compile("|".join(Patterns.EMAIL))):
             parts = val.split("@")
-            if cls.email_domain_validation(parts[1]):
+            if parts[1] in DOMAINS_DATA:
+                val.VALIDATION_META['valid'] = True
+                val.local_part = parts[0]
+                val.domain = parts[1]
+            elif cls.email_domain_validation(parts[1]):
+                DOMAINS_DATA.add(parts[1])
                 val.VALIDATION_META['valid'] = True
                 val.local_part = parts[0]
                 val.domain = parts[1]
@@ -220,7 +234,7 @@ class Validation:
             return False
         try:
             _domain = idna.uts46_remap(domain, std3_rules=False,
-                                      transitional=False)
+                                       transitional=False)
         except Exception:
             return False
         if _domain.endswith("."):
@@ -252,8 +266,8 @@ class Validation:
         error_pattern = re.compile(r"^ping: cannot resolve .*?: Unknown host.*")
         ping = subprocess.Popen(
             ["ping", "-c", "1", domain],
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE)
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
         _, error = ping.communicate()
         if re.match(error_pattern, str(error.decode('utf-8'))):
             return False
