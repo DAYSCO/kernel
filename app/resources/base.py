@@ -46,7 +46,7 @@ class UploadFile(GenericCall):
         else:
             try:
                 try:
-                    size_in_kb = int(str(self.file_size)) / 1024
+                    size_in_kb = round(int(str(self.file_size)) / 1024, 2)
                 except ValueError:
                     size_in_kb = 0.0
                 payload = dict(
