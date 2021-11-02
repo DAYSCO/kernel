@@ -45,10 +45,14 @@ class UploadFile(GenericCall):
             }
         else:
             try:
+                try:
+                    size_in_kb = int(str(self.file_size)) / 1024
+                except ValueError:
+                    size_in_kb = 0.0
                 payload = dict(
                     TableName=self.file_name,
                     FileName=self.file_name,
-                    SizeInKb=self.file_size,
+                    SizeInKb=size_in_kb,
                     uid=self.uid
                 )
                 if self.file_type in ['txt', 'csv', 'json', 'html']:
