@@ -464,7 +464,7 @@ class Actions:
                 ddf[_id].change_display_name(new_name=display_name)
 
         elif action == "updateValue":
-            _id = ddf[indexes].id
+            _id = ddf[indexes[0]].id
             old_value = payload.get('oldValue')
             row_index = payload['inputParams'][0].get('targetRowIndex')
             ddf[_id].update_value(
