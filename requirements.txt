@@ -3,7 +3,6 @@ requests==2.24.0
 virtualenv==20.0.7
 flask==1.1.2
 werkzeug==0.16.0
-flask_api
 lxml>=4.6.3
 smartystreets-python-sdk==4.7.3
 xlrd==1.2.0
