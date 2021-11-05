@@ -1,10 +1,10 @@
 import os
 import sys
-from flask import Flask
+from flask_api import FlaskAPI
 from .routes import app_bp
 
 
-app = Flask(__name__)
+app = FlaskAPI(__name__)
 app.register_blueprint(app_bp)
 
 

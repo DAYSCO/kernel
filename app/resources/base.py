@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 import pandas as pd
-# from flask import status
+from flask_api import status
 from flask import jsonify
 
 from app.days.actions import Actions
@@ -27,7 +27,7 @@ class GenericCall:
         self.payload = None
         self.method = request.method
         self.return_message = "successful request"
-        self.return_code = 200
+        self.return_code = status.HTTP_200_OK
         self.working_files = working_files
 
 
@@ -39,7 +39,7 @@ class UploadFile(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -64,7 +64,7 @@ class UploadFile(GenericCall):
                     except FileParseError as e:
                         self.payload = {
                             "message": str(e),
-                            "status_code": 400,
+                            "status_code": status.HTTP_400_BAD_REQUEST,
                             "kernel_status_code": e.status_code,
                             "errors": [str(e)]
                         }
@@ -86,7 +86,7 @@ class UploadFile(GenericCall):
                         except FileParseError as e:
                             self.payload = {
                                 "message": str(e),
-                                "status_code": 400,
+                                "status_code": status.HTTP_400_BAD_REQUEST,
                                 "kernel_status_code": e.status_code,
                                 "errors": [str(e)]
                             }
@@ -103,14 +103,14 @@ class UploadFile(GenericCall):
             except FileParseError as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 400,
+                    "status_code": status.HTTP_400_BAD_REQUEST,
                     "kernel_status_code": e.status_code,
                     "errors": [str(e)]
                 }
             except Exception as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 404,
+                    "status_code": status.HTTP_404_NOT_FOUND,
                     "kernel_status_code": status_codes['GeneralError'],
                     "errors": [str(e)]
                 }
@@ -122,7 +122,7 @@ class ReadFileContents(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -144,7 +144,7 @@ class ReadFileContents(GenericCall):
                 except FileParseError as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 400,
+                        "status_code": status.HTTP_400_BAD_REQUEST,
                         "kernel_status_code": e.status_code,
                         "errors": [str(e)]
                     }
@@ -159,7 +159,7 @@ class ReadFileContents(GenericCall):
             except Exception as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 404,
+                    "status_code": status.HTTP_404_NOT_FOUND,
                     "kernel_status_code": status_codes['GeneralError'],
                     "errors": [str(e)]
                 }
@@ -171,7 +171,7 @@ class TableSchema(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -181,7 +181,7 @@ class TableSchema(GenericCall):
             except IDNotFoundError as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 400,
+                    "status_code": status.HTTP_400_BAD_REQUEST,
                     "kernel_status_code": e.status_code,
                     "errors": [str(e)]
                 }
@@ -189,7 +189,7 @@ class TableSchema(GenericCall):
             except Exception as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 404,
+                    "status_code": status.HTTP_404_NOT_FOUND,
                     "kernel_status_code": status_codes['GeneralError'],
                     "errors": [str(e)]
                 }
@@ -201,7 +201,7 @@ class TableData(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -215,7 +215,7 @@ class TableData(GenericCall):
                 except (IDNotFoundError, PayloadError) as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 400,
+                        "status_code": status.HTTP_400_BAD_REQUEST,
                         "kernel_status_code": e.status_code,
                         "errors": [str(e)]
                     }
@@ -223,7 +223,7 @@ class TableData(GenericCall):
                 except Exception as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 404,
+                        "status_code": status.HTTP_404_NOT_FOUND,
                         "kernel_status_code": status_codes['GeneralError'],
                         "errors": [str(e)]
                     }
@@ -233,7 +233,7 @@ class TableData(GenericCall):
                 except IDNotFoundError as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 400,
+                        "status_code": status.HTTP_400_BAD_REQUEST,
                         "kernel_status_code": e.status_code,
                         "errors": [str(e)]
                     }
@@ -241,7 +241,7 @@ class TableData(GenericCall):
                 except Exception as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 404,
+                        "status_code": status.HTTP_404_NOT_FOUND,
                         "kernel_status_code": status_codes['GeneralError'],
                         "errors": [str(e)]
                     }
@@ -253,7 +253,7 @@ class ColumnAction(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -270,14 +270,14 @@ class ColumnAction(GenericCall):
                 self.payload = {
                     "message": str(e),
                     "errors": [str(e)],
-                    'status_code': 400,
+                    'status_code': status.HTTP_400_BAD_REQUEST,
                     'kernel_status_code': e.status_code
                 }
                 return
             except Exception as e:
                 self.payload = {
                     "message": str(e),
-                    "status_code": 404,
+                    "status_code": status.HTTP_404_NOT_FOUND,
                     "kernel_status_code": status_codes['GeneralError'],
                     "errors": [str(e)]
                 }
@@ -301,7 +301,7 @@ class TableAction(GenericCall):
         if not self.uid:
             self.payload = {
                 'message': "id missing from headers request",
-                'status_code': 400,
+                'status_code': status.HTTP_400_BAD_REQUEST,
                 'kernel_status_code':
                     status_codes['MissingHeaderAttributeError']
             }
@@ -313,7 +313,7 @@ class TableAction(GenericCall):
                     self.payload = {
                         "message": str(e),
                         "errors": [str(e)],
-                        'status_code': 400,
+                        'status_code': status.HTTP_400_BAD_REQUEST,
                         'kernel_status_code': e.status_code
                     }
                     return
@@ -338,7 +338,7 @@ class TableAction(GenericCall):
                 except Exception as e:
                     self.payload = {
                         "message": str(e),
-                        "status_code": 404,
+                        "status_code": status.HTTP_404_NOT_FOUND,
                         "kernel_status_code": status_codes['GeneralError'],
                         "errors": [str(e)]
                     }
