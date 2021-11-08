@@ -420,7 +420,7 @@ class Actions:
 
     @classmethod
     def undo(cls, ddf, payload, ids=None, indexes=None):
-        if indexes:
+        if indexes is not None:
             if not isinstance(indexes, list):
                 indexes = [indexes]
             try:
