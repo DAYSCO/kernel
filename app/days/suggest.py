@@ -194,9 +194,10 @@ class Suggestion:
 
     @classmethod
     def street_address(cls, series):
-        return cls.pattern_match(
-            cls.sample(series), "|".join(Patterns.STREETADDRESS),
-            cls.THRESHOLD)
+        # return cls.pattern_match(
+        #     cls.sample(series), "|".join(Patterns.STREETADDRESS),
+        #     cls.THRESHOLD)
+        return False
 
     @classmethod
     def zip(cls, series):
