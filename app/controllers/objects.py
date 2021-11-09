@@ -7,7 +7,7 @@ class ActiveWorkingFiles:
 
     def __getitem__(self, uid):
         for _ in self.working_files:
-            if _.uid == uid or _.uid == f"{uid}#1":
+            if _.uid == uid:
                 return _
         raise IDNotFoundError(uid)
 
@@ -23,4 +23,5 @@ class ActiveWorkingFiles:
         self.working_files.append(wf)
 
     def remove(self, uid):
-        self.working_files.remove(self[uid])
+        if uid in self.keys:
+            self.working_files.remove(self[uid])
