@@ -460,7 +460,7 @@ class Actions:
             schemas = payload.get('schema', [])
 
             for _id, schema in zip(ids, schemas):
-                display_name = schema['customType']
+                display_name = schema['displayName']
                 ddf[_id].change_display_name(new_name=display_name)
 
         elif action == "updateValue":
