@@ -5,6 +5,7 @@ from dateutil.parser import parse
 from .suggest import Suggestion
 from .validate import Validation
 from ..exceptions import PayloadError, InvalidDataTypeError, DuplicateNameError
+from ..days.custom_types import *
 
 
 class DaysDataFrame:
@@ -231,8 +232,14 @@ class DaysSeries:
                                  for x in self.series])
 
     def date_format(self, date_format):
-        self.series = pd.Series([parse(x).strftime(date_format)
-                                 for x in self.series])
+        date_list = []
+        for x in self.series:
+            try:
+                x = parse(x).strftime(date_format)
+            except:
+                x = ''
+            date_list.append(Datetime(x))
+        self.series = pd.Series(date_list)
 
     def format(self, casing):
         if casing == "lowerCase":
