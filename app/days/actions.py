@@ -158,7 +158,7 @@ class Actions:
             first = False
             new_name.append(ddf[index].name)
 
-        new_name.append("concatenate")
+        new_name.append("combine")
         new_name = "_".join(new_name)
         new_name = ddf.new_column_name(new_name)
         new_series.name = new_name
@@ -192,7 +192,10 @@ class Actions:
         new_columns = list()
 
         for _id in ids:
-            new_name = f"{ddf[_id].display_name}_{action}"
+            new_name = action
+            if new_name == 'camelCase':
+                new_name = 'titleCase'
+            new_name = f"{ddf[_id].display_name}_{new_name}"
             new_index = ddf[_id].index + 1
             series = ddf[_id].series
             new_name = ddf.new_column_name(new_name)

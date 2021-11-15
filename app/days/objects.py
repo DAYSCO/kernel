@@ -135,11 +135,12 @@ class DaysDataFrame:
         self._columns.pop(index)
 
     def new_column_name(self, name, limit=10):
-        column_names = set(x.name for x in self.columns)
-        column_names.update(set(x.display_name for x in self.columns))
+        column_names = set(x.name.lower() for x in self.columns)
+        column_names.update(set(x.display_name.lower() for x in self.columns))
         new_name = name
         for i in range(1, limit):
-            if new_name in column_names:
+            _ = new_name.lower()
+            if _ in column_names:
                 new_name = f"{name}__{i}"
             else:
                 break

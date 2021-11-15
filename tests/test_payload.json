@@ -518,12 +518,12 @@
                     {
                         "customType": "STREETADDRESS",
                         "dataType": "string",
-                        "displayName": "address_city_state_zipcode_concatenate",
+                        "displayName": "address_city_state_zipcode_combine",
                         "distinctCount": 5,
                         "extended": {},
                         "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
                         "index": 10,
-                        "name": "address_city_state_zipcode_concatenate",
+                        "name": "address_city_state_zipcode_combine",
                         "nonNullCount": 5,
                         "visible": true
                     },
@@ -901,12 +901,12 @@
             {
                 "customType": "ADDRESS",
                 "dataType": "string",
-                "displayName": "address_city_state_zipcode_concatenate",
+                "displayName": "address_city_state_zipcode_combine",
                 "distinctCount": 5,
                 "extended": {},
                 "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
                 "index": 18,
-                "name": "address_city_state_zipcode_concatenate",
+                "name": "address_city_state_zipcode_combine",
                 "nonNullCount": 5,
                 "visible": true
             },
@@ -952,7 +952,7 @@
                 "2": "2 test",
                 "3": "01312 Spohn Way"
             },
-            "address_city_state_zipcode_concatenate": {
+            "address_city_state_zipcode_combine": {
                 "0": "8 Stone Place Somerville Massachusetts 02143",
                 "1": "06 test Pass test test 12345",
                 "2": "2 test test Texas 12345",
