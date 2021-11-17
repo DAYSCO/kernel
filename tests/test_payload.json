@@ -300,7 +300,7 @@
             ]
         }
     },
-    "test_90_change_date_format": {
+    "test_90a_change_date_format": {
         "payload": {
             "action": "formatDateTime",
             "inputParams": [
@@ -311,6 +311,39 @@
                     "datetimeFormat": "%d-%m-%Y"
                 }
             ]
+        }
+    },
+    "test_90b_split_by_indexes": {
+        "payload": {
+           "action": "split",
+           "inputParams": [
+              {
+                 "indexes": [
+                    0
+                 ],
+                 "splitIndexes": [
+                    4,
+                    6
+                 ],
+                "keepOriginal": true
+              }
+           ]
+        }
+    },
+    "test_90c_split_by_string": {
+        "payload": {
+           "action": "split",
+           "inputParams": [
+              {
+                 "indexes": [
+                    0
+                 ],
+                 "splitStringMeta": {
+                    "splitString": "a",
+                    "splitLimit": 1
+                 }
+              }
+           ]
         }
     },
     "test_9_lowercase": {
@@ -1083,6 +1116,36 @@
                 "1": "12345",
                 "2": "12345",
                 "3": "12345"
+            },
+            "first_name_split_0__1": {
+                "0": "Mich",
+                "1": "Jo",
+                "2": "Arron",
+                "3": "Sibylle"
+            },
+            "first_name_split_1__1": {
+                "0": "el",
+                "1": "",
+                "2": "",
+                "3": ""
+            },
+            "first_name_split_0": {
+                "0": "Mich",
+                "1": "Jo",
+                "2": "Arro",
+                "3": "Siby"
+            },
+            "first_name_split_1": {
+                "0": "e",
+                "1": "",
+                "2": "",
+                "3": "l"
+            },
+            "first_name_split_2": {
+                "0": "",
+                "1": "",
+                "2": "",
+                "3": ""
             }
         }
     },

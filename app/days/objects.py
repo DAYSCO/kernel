@@ -83,7 +83,7 @@ class DaysDataFrame:
         return str(self.schema)
 
     def __getitem__(self, key):
-        for ser in self.columns:
+        for ser in self.all_columns:
             if ser.id == key or ser.index == key:
                 return ser
         raise ValueError(f"Id or index {key} does not exist.")
@@ -283,3 +283,23 @@ class DaysSeries:
             return value + insert_str
         else:
             return value[:insert_index] + insert_str + value[insert_index:]
+
+    def split_by_index(self, limit_index, split_indexes):
+        series = []
+        start = [0] + [x + 1 for x in split_indexes]
+        end = split_indexes + [None]
+        for x in self.series:
+            x = x[start[limit_index]:end[limit_index]]
+            series.append(String(x))
+        self.series = pd.Series(series)
+
+    def split_by_string(self, split_index, split_string):
+        series = []
+        for x in self.series:
+            x = self.get_index(x.split(split_string), split_index)
+            series.append(String(x))
+        self.series = pd.Series(series)
+
+    @classmethod
+    def get_index(cls, lst, index, default=''):
+        return lst[index] if len(lst) > index else default
