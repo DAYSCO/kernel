@@ -170,16 +170,40 @@ class BasicTests(unittest.TestCase):
         print(f"Undo")
         self.assertEqual(response.status_code, 200)
 
-    def test_90_change_date_format(self):
+    def test_90a_change_date_format(self):
         headers = {
             "Content-Type": "application/json",
             "id": self.test_id
         }
-        json = self.config['test_90_change_date_format']['payload']
+        json = self.config['test_90a_change_date_format']['payload']
         response = self.app.put('/api/v1/column/action',
                                 headers=headers, json=json)
         print()
         print(f"Change date format for columns {json['inputParams'][0]['indexes']} to {json['inputParams'][0]['datetimeFormat']}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_90b_split_by_indexes(self):
+        headers = {
+            "Content-Type": "application/json",
+            "id": self.test_id
+        }
+        json = self.config['test_90b_split_by_indexes']['payload']
+        response = self.app.put('/api/v1/column/action',
+                                headers=headers, json=json)
+        print()
+        print(f"Split columns by index {json['inputParams'][0]['indexes']}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_90c_split_by_string(self):
+        headers = {
+            "Content-Type": "application/json",
+            "id": self.test_id
+        }
+        json = self.config['test_90c_split_by_string']['payload']
+        response = self.app.put('/api/v1/column/action',
+                                headers=headers, json=json)
+        print()
+        print(f"Split columns by string {json['inputParams'][0]['indexes']}")
         self.assertEqual(response.status_code, 200)
 
     def test_91_get_schema(self):
@@ -237,6 +261,14 @@ class BasicTests(unittest.TestCase):
         file_path = self.config['test_94_export_content']['file_path']
         file_data = codecs.open(file_path, 'rb').read()
         self.assertEqual(response.data, file_data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_95_validate_address(self):
+        json = self.config['test_95_validate_address']['payload']
+        response = self.app.post('/api/v1/address/validate', json=json)
+        self.assertEqual(
+            response.json,
+            self.config['test_95_validate_address']['check_result'])
         self.assertEqual(response.status_code, 200)
 
 

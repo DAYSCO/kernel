@@ -50,6 +50,8 @@ class DaysDataFrame:
     @property
     def data_frame(self):
         data = [x.series for x in self.columns]
+        if len(data) == 0:
+            return pd.DataFrame()
         return pd.concat(data, axis=1, keys=self.display_name)
 
     @property
@@ -83,7 +85,7 @@ class DaysDataFrame:
         return str(self.schema)
 
     def __getitem__(self, key):
-        for ser in self.columns:
+        for ser in self.all_columns:
             if ser.id == key or ser.index == key:
                 return ser
         raise ValueError(f"Id or index {key} does not exist.")
@@ -135,11 +137,12 @@ class DaysDataFrame:
         self._columns.pop(index)
 
     def new_column_name(self, name, limit=10):
-        column_names = set(x.name for x in self.columns)
-        column_names.update(set(x.display_name for x in self.columns))
+        column_names = set(x.name.lower() for x in self.columns)
+        column_names.update(set(x.display_name.lower() for x in self.columns))
         new_name = name
         for i in range(1, limit):
-            if new_name in column_names:
+            _ = new_name.lower()
+            if _ in column_names:
                 new_name = f"{name}__{i}"
             else:
                 break
@@ -228,8 +231,12 @@ class DaysSeries:
         self.series = Validation.validate(self.series, custom_type)
 
     def substitute(self, match_str, replace_str):
-        self.series = pd.Series([x.replace(match_str, replace_str)
-                                 for x in self.series])
+        if match_str:
+            self.series = pd.Series(
+                [x.replace(match_str, replace_str) for x in self.series])
+        else:
+            self.series = pd.Series(
+                [x if x else replace_str for x in self.series])
 
     def date_format(self, date_format):
         date_list = []
@@ -282,3 +289,23 @@ class DaysSeries:
             return value + insert_str
         else:
             return value[:insert_index] + insert_str + value[insert_index:]
+
+    def split_by_index(self, limit_index, split_indexes):
+        series = []
+        start = [0] + [x + 1 for x in split_indexes]
+        end = split_indexes + [None]
+        for x in self.series:
+            x = x[start[limit_index]:end[limit_index]]
+            series.append(String(x))
+        self.series = pd.Series(series)
+
+    def split_by_string(self, split_index, split_string):
+        series = []
+        for x in self.series:
+            x = self.get_index(x.split(split_string), split_index)
+            series.append(String(x))
+        self.series = pd.Series(series)
+
+    @classmethod
+    def get_index(cls, lst, index, default=''):
+        return lst[index] if len(lst) > index else default

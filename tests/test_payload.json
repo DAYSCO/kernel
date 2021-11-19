@@ -300,7 +300,7 @@
             ]
         }
     },
-    "test_90_change_date_format": {
+    "test_90a_change_date_format": {
         "payload": {
             "action": "formatDateTime",
             "inputParams": [
@@ -311,6 +311,39 @@
                     "datetimeFormat": "%d-%m-%Y"
                 }
             ]
+        }
+    },
+    "test_90b_split_by_indexes": {
+        "payload": {
+           "action": "split",
+           "inputParams": [
+              {
+                 "indexes": [
+                    0
+                 ],
+                 "splitIndexes": [
+                    4,
+                    6
+                 ],
+                "keepOriginal": true
+              }
+           ]
+        }
+    },
+    "test_90c_split_by_string": {
+        "payload": {
+           "action": "split",
+           "inputParams": [
+              {
+                 "indexes": [
+                    0
+                 ],
+                 "splitStringMeta": {
+                    "splitString": "a",
+                    "splitLimit": 1
+                 }
+              }
+           ]
         }
     },
     "test_9_lowercase": {
@@ -518,12 +551,12 @@
                     {
                         "customType": "STREETADDRESS",
                         "dataType": "string",
-                        "displayName": "address_city_state_zipcode_concatenate",
+                        "displayName": "address_city_state_zipcode_combine",
                         "distinctCount": 5,
                         "extended": {},
                         "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
                         "index": 10,
-                        "name": "address_city_state_zipcode_concatenate",
+                        "name": "address_city_state_zipcode_combine",
                         "nonNullCount": 5,
                         "visible": true
                     },
@@ -901,12 +934,12 @@
             {
                 "customType": "ADDRESS",
                 "dataType": "string",
-                "displayName": "address_city_state_zipcode_concatenate",
+                "displayName": "address_city_state_zipcode_combine",
                 "distinctCount": 5,
                 "extended": {},
                 "id": "59bb5fe3-7707-4089-a1f1-f1de05c192fc",
                 "index": 18,
-                "name": "address_city_state_zipcode_concatenate",
+                "name": "address_city_state_zipcode_combine",
                 "nonNullCount": 5,
                 "visible": true
             },
@@ -952,7 +985,7 @@
                 "2": "2 test",
                 "3": "01312 Spohn Way"
             },
-            "address_city_state_zipcode_concatenate": {
+            "address_city_state_zipcode_combine": {
                 "0": "8 Stone Place Somerville Massachusetts 02143",
                 "1": "06 test Pass test test 12345",
                 "2": "2 test test Texas 12345",
@@ -1083,6 +1116,36 @@
                 "1": "12345",
                 "2": "12345",
                 "3": "12345"
+            },
+            "first_name_split_0__1": {
+                "0": "Mich",
+                "1": "Jo",
+                "2": "Arron",
+                "3": "Sibylle"
+            },
+            "first_name_split_1__1": {
+                "0": "el",
+                "1": "",
+                "2": "",
+                "3": ""
+            },
+            "first_name_split_0": {
+                "0": "Mich",
+                "1": "Jo",
+                "2": "Arro",
+                "3": "Siby"
+            },
+            "first_name_split_1": {
+                "0": "e",
+                "1": "",
+                "2": "",
+                "3": "l"
+            },
+            "first_name_split_2": {
+                "0": "",
+                "1": "",
+                "2": "",
+                "3": ""
             }
         }
     },
@@ -1100,6 +1163,20 @@
         "file_path": "tests/output.csv",
         "payload": {
             "action": "export"
+        }
+    },
+    "test_95_validate_address": {
+        "payload": {
+            "inputParams": [
+                {
+                    "address": "9 Walton Crossing Newton Massachusetts"
+                }
+            ]
+        },
+        "check_result": {
+            "results": [
+                "9 Wilton Rd Newtonville MA 02460-1574"
+            ]
         }
     }
 }

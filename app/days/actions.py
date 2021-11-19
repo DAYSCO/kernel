@@ -21,6 +21,8 @@ class Actions:
         if action != 'export':
             try:
                 indexes = params[0]['indexes']
+                if isinstance(indexes, list):
+                    indexes = sorted(indexes)
             except:
                 raise PayloadError("indexes", "None")
 
@@ -83,6 +85,11 @@ class Actions:
                 ddf=ddf,
                 payload=payload,
                 index=indexes)
+        elif action == "split":
+            ddf, payload_res = cls.split_value(
+                ddf=ddf,
+                payload=payload,
+                indexes=indexes)
         else:
             raise PayloadError("action", action)
         return ddf, payload_res
@@ -158,7 +165,7 @@ class Actions:
             first = False
             new_name.append(ddf[index].name)
 
-        new_name.append("concatenate")
+        new_name.append("combine")
         new_name = "_".join(new_name)
         new_name = ddf.new_column_name(new_name)
         new_series.name = new_name
@@ -192,7 +199,10 @@ class Actions:
         new_columns = list()
 
         for _id in ids:
-            new_name = f"{ddf[_id].display_name}_{action}"
+            new_name = action
+            if new_name == 'camelCase':
+                new_name = 'titleCase'
+            new_name = f"{ddf[_id].display_name}_{new_name}"
             new_index = ddf[_id].index + 1
             series = ddf[_id].series
             new_name = ddf.new_column_name(new_name)
@@ -279,7 +289,7 @@ class Actions:
             new_name = f"{ddf[_id].display_name}_substitute"
             new_index = ddf[_id].index + 1
             series = ddf[_id].series
-            new_name= ddf.new_column_name(new_name)
+            new_name = ddf.new_column_name(new_name)
             series.name = new_name
             new_index = ddf.new_column(series=series,
                                        index=new_index)
@@ -426,7 +436,7 @@ class Actions:
             try:
                 ids = [ddf[index].id for index in indexes]
             except:
-                ids = [ddf._columns[index].id for index in indexes]
+                ids = [ddf[index].id for index in indexes]
 
         if not ids:
             raise MissingPayloadValueError('indexes')
@@ -436,14 +446,14 @@ class Actions:
 
         if action in ["upperCase", "lowerCase", "camelCase", "substitute",
                       "validate", "formatDateTime", "concatenate",
-                      "insertString"]:
+                      "insertString", "split"]:
             remove_ids = [ddf[index].id for index in payload['newColumns']]
 
             for _id in remove_ids:
                 ddf.remove_column(_id=_id)
 
             for index in indexes:
-                ddf._columns[index].update_visibility(visible=True)
+                ddf[index].update_visibility(visible=True)
 
         elif action == "changeType":
             schemas = payload.get('schema', [])
@@ -454,7 +464,7 @@ class Actions:
 
         elif action == "remove":
             for index in indexes:
-                ddf._columns[index].update_visibility(visible=True)
+                ddf[index].update_visibility(visible=True)
 
         elif action == "rename":
             schemas = payload.get('schema', [])
@@ -541,5 +551,97 @@ class Actions:
         payload['oldValue'] = old_value
         payload_res.update({"action": payload,
                             "new_columns": []})
+
+        return ddf, payload_res
+
+    @classmethod
+    def split_value(cls, ddf, payload, ids=None, indexes=None):
+        if indexes is not None:
+            ids = [ddf[index].id for index in indexes]
+
+        if not ids:
+            raise MissingPayloadValueError('indexes')
+
+        params = payload.get('inputParams', [{}])[0]
+        keep_original = params.get('keepOriginal', True)
+        split_string_meta = params.get('splitStringMeta', {})
+        split_indexes = params.get('splitIndexes')
+        split_string = ' '
+        payload_res = dict()
+        new_columns = list()
+
+        if bool(split_string_meta):
+            if bool(split_indexes):
+                raise PayloadError(
+                    key='splitStringMeta',
+                    value='splitIndexes',
+                    message='can not apply action on both fields.'
+                )
+            else:
+                try:
+                    split_limit = split_string_meta['splitLimit']
+                    if 0 >= split_limit:
+                        raise PayloadError(
+                            key="splitLimit",
+                            value=split_limit,
+                            message='is less then or equal to zero.'
+                        )
+                except:
+                    raise PayloadError(
+                        key="splitLimit",
+                        value="None",
+                        message='is missing from splitStringMeta.'
+                    )
+                split_string = split_string_meta.get('splitString', '')
+                if split_string == '':
+                    raise PayloadError(
+                        key="splitString",
+                        value="None",
+                        message='is missing from splitStringMeta.'
+                    )
+                sub_action = 'splitString'
+        elif split_indexes is not None:
+            if len(split_indexes) == 0:
+                raise PayloadError(
+                    key="splitIndexes",
+                    value="[]",
+                    message='splitIndexes can not be empty.'
+                )
+            _ = set(split_indexes)
+            if len(_) != len(split_indexes):
+                raise PayloadError(
+                    key="splitIndexes",
+                    value=split_indexes,
+                    message='contains duplicate values.'
+                )
+            sub_action = "splitIndexes"
+            split_limit = len(split_indexes)
+        else:
+            raise MissingPayloadValueError('splitStringMeta and splitIndexes')
+
+        for _id in ids:
+            for i in range(split_limit + 1):
+                new_name = f"{ddf[_id].display_name}_split_{i}"
+                new_index = ddf[_id].index + 1 + i
+                series = ddf[_id].series
+                new_name = ddf.new_column_name(new_name)
+                series.name = new_name
+                new_index = ddf.new_column(series=series,
+                                           index=new_index)
+                if sub_action == 'splitIndexes':
+                    ddf[new_index].split_by_index(limit_index=i,
+                                                  split_indexes=split_indexes)
+                elif sub_action == 'splitString':
+                    ddf[new_index].split_by_string(split_index=i,
+                                                   split_string=split_string)
+                new_columns.append(new_index)
+
+        if not keep_original:
+            for _id in ids:
+                ddf[_id].visible = False
+
+        payload['newColumns'] = new_columns
+        payload_res.update({"action": payload,
+                            "new_columns": new_columns})
 
         return ddf, payload_res
