@@ -1164,5 +1164,19 @@
         "payload": {
             "action": "export"
         }
+    },
+    "test_95_validate_address": {
+        "payload": {
+            "inputParams": [
+                {
+                    "address": "9 Walton Crossing Newton Massachusetts"
+                }
+            ]
+        },
+        "check_result": {
+            "results": [
+                "9 Wilton Rd Newtonville MA 02460-1574"
+            ]
+        }
     }
 }

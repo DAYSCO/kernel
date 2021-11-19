@@ -152,3 +152,15 @@ def undo_action():
         return request_obj.payload, request_obj.return_code
     else:
         return request_obj.return_message, request_obj.return_code
+
+
+@app_bp.route('/api/v1/address/validate', methods=['POST'])
+def validation_action():
+    logger.info(f"'perform address validation action' "
+                f"{request.method} request, {request.remote_addr}")
+    request_obj = ValidationAction(request=request)
+    logger.info(f"{request_obj.return_message} {request_obj.return_code}")
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code

@@ -6,6 +6,7 @@ from flask import jsonify
 
 from app.days.actions import Actions
 from app.manager import Ingester
+from app.days.validate import Validation
 from app.days.objects import DaysDataFrame
 from app.exceptions import (
     DuplicateNameError,
@@ -350,3 +351,24 @@ class TableAction(GenericCall):
                     "status_code": self.return_code,
                     "file_path": payload_res.get('file_path')
                 }
+
+
+class ValidationAction:
+    def __init__(self, request, action=None):
+        self.json_response = request.get_json()
+        self.method = request.method
+        self.return_message = "successful request"
+        self.return_code = status.HTTP_200_OK
+        self.payload = {}
+        results = self.validate_address
+        self.payload = results
+
+    @property
+    def validate_address(self):
+        address = self.json_response['inputParams'][0]['address']
+        if isinstance(address, str):
+            address = [address]
+        results = Validation.smartystreet(address_full=address)
+        return {
+            'results': results
+        }
