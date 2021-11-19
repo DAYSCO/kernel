@@ -50,6 +50,8 @@ class DaysDataFrame:
     @property
     def data_frame(self):
         data = [x.series for x in self.columns]
+        if len(data) == 0:
+            return pd.DataFrame()
         return pd.concat(data, axis=1, keys=self.display_name)
 
     @property
@@ -229,8 +231,12 @@ class DaysSeries:
         self.series = Validation.validate(self.series, custom_type)
 
     def substitute(self, match_str, replace_str):
-        self.series = pd.Series([x.replace(match_str, replace_str)
-                                 for x in self.series])
+        if match_str:
+            self.series = pd.Series(
+                [x.replace(match_str, replace_str) for x in self.series])
+        else:
+            self.series = pd.Series(
+                [x if x else replace_str for x in self.series])
 
     def date_format(self, date_format):
         date_list = []
