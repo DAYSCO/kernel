@@ -5,9 +5,12 @@ import idna
 import re
 
 from smartystreets_python_sdk import (StaticCredentials, exceptions, Batch,
-                                      ClientBuilder)
+                                      SharedCredentials, ClientBuilder)
 from smartystreets_python_sdk.us_street import Lookup as StreetLookup
 from smartystreets_python_sdk.us_zipcode import Lookup as ZIPCodeLookup
+from smartystreets_python_sdk.us_autocomplete_pro import (
+    Lookup as AutocompleteProLookup
+)
 
 from dateutil.parser import parse
 from .custom_types import *
@@ -21,6 +24,9 @@ class Validation:
     SMARTYSTREETS_AUTH_ID = os.environ.get(
         'SMARTYSTREETS_AUTH_ID', '5aa199f9-3d5f-f2ba-b41f-74b953b5d1d6')
     USERID = "467DAYS06449"
+    KEY_ID = os.environ.get("KEY_ID", '33603386701207625')
+    SMARTYSTREETS_HOSTNAME = os.environ.get("SMARTYSTREETS_HOSTNAME",
+                                            "playwithmydata.com/")
 
     @classmethod
     def validate(cls, series, custom_type, invalid="INVALID"):
@@ -311,3 +317,23 @@ class Validation:
         l = len(iterable)
         for ndx in range(0, l, n):
             yield iterable[ndx:min(ndx + n, l)]
+
+    @classmethod
+    def smartystreet_auto_complete(cls, address_full=[], invalid="INVALID"):
+        credentials = SharedCredentials(cls.KEY_ID, cls.SMARTYSTREETS_HOSTNAME)
+        client = ClientBuilder(credentials).with_licenses(
+            ["us-autocomplete-pro-cloud"]
+        ).build_us_autocomplete_pro_api_client()
+        lookup = AutocompleteProLookup(address_full[0])
+
+        client.send(lookup)
+        results = []
+        for suggestion in lookup.result:
+            address = suggestion.street_line
+            if suggestion.secondary:
+                address += f" {suggestion.secondary}"
+            address += (f", {suggestion.city}, {suggestion.state} "
+                        f"{suggestion.zipcode}")
+            results.append(address)
+
+        return results
