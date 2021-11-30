@@ -342,11 +342,9 @@ class DaysSeries:
                 _ = find_format(value)
                 if _ in date_formats.keys():
                     date_formats[_] += 1
-                else:
-                    print('Unknown date format')
+
             date_formats = dict(
-                sorted(date_formats.items(), key=lambda item: item[1], reverse=True))
+                sorted(date_formats.items(), key=lambda item: item[1],
+                       reverse=True))
 
-            print(date_formats)
             self.extended['dateFormat'] = list(date_formats.keys())[0]
-
