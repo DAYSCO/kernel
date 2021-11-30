@@ -1,3 +1,6 @@
+import datetime
+import re
+
 from uuid import uuid4
 import pandas as pd
 from dateutil.parser import parse
@@ -168,6 +171,7 @@ class DaysSeries:
         self.non_null_count = len(self.series.notnull())
         self.visible = True
         self.suggest_type()
+        self.series_date_format()
 
     @property
     def row_count(self):
@@ -309,3 +313,38 @@ class DaysSeries:
     @classmethod
     def get_index(cls, lst, index, default=''):
         return lst[index] if len(lst) > index else default
+
+    def series_date_format(self):
+        if self.custom_type == 'DATETIME':
+            date_formats = {
+                '%d-%m-%Y': 0, '%m-%d-%Y': 0, '%Y-%d-%m': 0, '%Y-%m-%d': 0,
+                '%d-%m': 0, '%m-%d': 0, '%Y-%m': 0, '%m-%Y': 0, '%d-%b-%Y': 0,
+                '%b-%d-%Y': 0, '%Y-%d-%b': 0, '%Y-%b-%d': 0, '%d-%b': 0,
+                '%b-%d': 0, '%Y-%b': 0, '%b-%Y': 0, '%d-%B-%Y': 0,
+                '%B-%d-%Y': 0, '%Y-%d-%B': 0, '%Y-%B-%d': 0, '%d-%B': 0,
+                '%B-%d': 0, '%Y-%B': 0, '%B-%Y': 0
+            }
+
+            def find_format(input_value):
+                if value:
+                    _value = re.split(" |,|;|-|/|'|at|on|and|of|st|nd|rd|th",
+                                      input_value)
+                    _value = '-'.join([_ for _ in _value if value])
+                    for _format in date_formats.keys():
+                        try:
+                            datetime.datetime.strptime(_value, _format)
+                            return _format
+                        except:
+                            pass
+                return None
+
+            for value in self.series:
+                _ = find_format(value)
+                if _ in date_formats.keys():
+                    date_formats[_] += 1
+
+            date_formats = dict(
+                sorted(date_formats.items(), key=lambda item: item[1],
+                       reverse=True))
+
+            self.extended['dateFormat'] = list(date_formats.keys())[0]

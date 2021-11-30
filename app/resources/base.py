@@ -368,7 +368,7 @@ class ValidationAction:
         address = self.json_response['inputParams'][0]['address']
         if isinstance(address, str):
             address = [address]
-        results = Validation.smartystreet(address_full=address)
+        results = Validation.smartystreet_auto_complete(address_full=address)
         return {
             'results': results
         }
