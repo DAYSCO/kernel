@@ -384,8 +384,6 @@ class ValidationAction:
         city = self.json_response['inputParams'][0]['city']
         state = self.json_response['inputParams'][0]['state']
         zip_code = self.json_response['inputParams'][0]['zipCode']
-        if isinstance(address, str):
-            address = [address]
         results = Validation.smartystreet_us_street(
             address=address,
             address2=address2,

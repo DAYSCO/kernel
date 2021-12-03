@@ -353,8 +353,7 @@ class Validation:
             city=city,
             state=state,
             zipcode=zip_code,
-            candidates=5,
-            match="invalid"
+            candidates=5
         )
 
         try:
@@ -363,17 +362,21 @@ class Validation:
             print(err)
             return
 
-        results = []
+        if len(lookup.result) > 0:
+            results = []
+            for candidate in lookup.result:
+                delivery_line_1 = candidate.delivery_line_1 or ''
+                delivery_line_2 = candidate.delivery_line_2 or ''
+                delivery_last_line = candidate.last_line or ''
+                address_details = (
+                    f"{delivery_line_1} "
+                    f"{delivery_line_2 + ' ' if delivery_line_2 else ''}"
+                    f"{delivery_last_line}"
+                )
+                results.append(address_details)
 
-        for candidate in lookup.result:
-            delivery_line_1 = candidate.delivery_line_1 or ''
-            delivery_line_2 = candidate.delivery_line_2 or ''
-            delivery_last_line = candidate.last_line or ''
-            address_details = (
-                f"{delivery_line_1} "
-                f"{delivery_line_2 + ' ' if delivery_line_2 else ''}"
-                f"{delivery_last_line}"
-            )
-            results.append(address_details)
+        else:
+            full_address = f'{address} {address2} {city}, {state} {zip_code}'
+            results = cls.smartystreet_auto_complete([full_address])
 
         return results
