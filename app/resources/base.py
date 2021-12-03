@@ -354,13 +354,16 @@ class TableAction(GenericCall):
 
 
 class ValidationAction:
-    def __init__(self, request, action=None):
+    def __init__(self, request, version=''):
         self.json_response = request.get_json()
         self.method = request.method
         self.return_message = "successful request"
         self.return_code = status.HTTP_200_OK
         self.payload = {}
-        results = self.validate_address
+        if version == 'v2':
+            results = self.validate_us_address
+        else:
+            results = self.validate_address
         self.payload = results
 
     @property
@@ -369,6 +372,26 @@ class ValidationAction:
         if isinstance(address, str):
             address = [address]
         results = Validation.smartystreet_auto_complete(address_full=address)
+        return {
+            'results': results
+        }
+
+    @property
+    def validate_us_address(self):
+        address = self.json_response['inputParams'][0]['address']
+        address2 = self.json_response['inputParams'][0]['address2']
+        city = self.json_response['inputParams'][0]['city']
+        state = self.json_response['inputParams'][0]['state']
+        zip_code = self.json_response['inputParams'][0]['zipCode']
+        if isinstance(address, str):
+            address = [address]
+        results = Validation.smartystreet_us_street(
+            address=address,
+            address2=address2,
+            city=city,
+            state=state,
+            zip_code=zip_code
+        )
         return {
             'results': results
         }

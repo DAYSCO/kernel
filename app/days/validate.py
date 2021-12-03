@@ -337,3 +337,43 @@ class Validation:
             results.append(address)
 
         return results
+
+    @classmethod
+    def smartystreet_us_street(cls, address='', address2='', city='', state='',
+                               zip_code=''):
+
+        credentials = StaticCredentials(cls.SMARTYSTREETS_AUTH_ID,
+                                        cls.SMARTYSTREETS_AUTH_TOKEN)
+        client = ClientBuilder(credentials).with_licenses(
+            ["us-standard-cloud"]).build_us_street_api_client()
+
+        lookup = StreetLookup(
+            street=address,
+            street2=address2,
+            city=city,
+            state=state,
+            zipcode=zip_code,
+            candidates=5,
+            match="invalid"
+        )
+
+        try:
+            client.send_lookup(lookup)
+        except exceptions.SmartyException as err:
+            print(err)
+            return
+
+        results = []
+
+        for candidate in lookup.result:
+            delivery_line_1 = candidate.delivery_line_1 or ''
+            delivery_line_2 = candidate.delivery_line_2 or ''
+            delivery_last_line = candidate.last_line or ''
+            address_details = (
+                f"{delivery_line_1} "
+                f"{delivery_line_2 + ' ' if delivery_line_2 else ''}"
+                f"{delivery_last_line}"
+            )
+            results.append(address_details)
+
+        return results

@@ -271,6 +271,14 @@ class BasicTests(unittest.TestCase):
             self.config['test_95_validate_address']['check_result'])
         self.assertEqual(response.status_code, 200)
 
+    def test_96_validate_address(self):
+        json = self.config['test_96_validate_address']['payload']
+        response = self.app.post('/api/v2/address/validate', json=json)
+        self.assertEqual(
+            response.json,
+            self.config['test_96_validate_address']['check_result'])
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()
