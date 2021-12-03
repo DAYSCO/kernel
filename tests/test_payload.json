@@ -1187,5 +1187,24 @@
                 "9 Walton Ln, Hurley, NY 12443"
             ]
         }
+    },
+    "test_96_validate_address": {
+        "payload": {
+            "inputParams": [
+                {
+                    "address": "800 E 9th Street",
+                    "address2": "",
+                    "city": "",
+                    "state": "FL",
+                    "zipCode": 32703
+
+                }
+            ]
+        },
+        "check_result": {
+            "results": [
+                "800 E 9th St Apopka FL 32703-5416"
+            ]
+        }
     }
 }

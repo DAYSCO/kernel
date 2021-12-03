@@ -30,3 +30,7 @@ class Config:
     DATA_PATH = os.environ.get("DAYS_DATA_PATH", os.path.join(os.path.dirname(
         os.path.abspath(__file__)).split(f"app{spl}config")[0], "data"))
     DATA_PATH = DATA_PATH.rstrip(spl)
+
+    DATA_EXAMPLES_PATH = os.environ.get("DAYS_DATA_PATH", os.path.join(os.path.dirname(
+        os.path.abspath(__file__)).split(f"app{spl}config")[0], "examples"))
+    DATA_EXAMPLES_PATH = DATA_EXAMPLES_PATH.rstrip(spl)

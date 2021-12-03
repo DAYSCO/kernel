@@ -244,9 +244,12 @@ class DaysSeries:
 
     def date_format(self, date_format):
         date_list = []
+        _format = self.extended.get("dateFormat", "%d-%m-%Y")
         for x in self.series:
             try:
-                x = parse(x).strftime(date_format)
+                x = re.split(" |,|;|-|/|'|at|on|and|of|st|nd|rd|th", x)
+                x = '-'.join([_ for _ in x if _])
+                x = datetime.datetime.strptime(x, _format).strftime(date_format)
             except:
                 x = ''
             date_list.append(Datetime(x))
@@ -326,10 +329,10 @@ class DaysSeries:
             }
 
             def find_format(input_value):
-                if value:
+                if input_value:
                     _value = re.split(" |,|;|-|/|'|at|on|and|of|st|nd|rd|th",
                                       input_value)
-                    _value = '-'.join([_ for _ in _value if value])
+                    _value = '-'.join([_ for _ in _value if _])
                     for _format in date_formats.keys():
                         try:
                             datetime.datetime.strptime(_value, _format)
