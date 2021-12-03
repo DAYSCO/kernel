@@ -372,6 +372,7 @@ class ValidationAction:
         if isinstance(address, str):
             address = [address]
         results = Validation.smartystreet_auto_complete(address_full=address)
+
         return {
             'results': results
         }
@@ -392,6 +393,7 @@ class ValidationAction:
             state=state,
             zip_code=zip_code
         )
+
         return {
             'results': results
         }

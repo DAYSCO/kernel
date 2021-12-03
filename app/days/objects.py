@@ -317,7 +317,7 @@ class DaysSeries:
     def get_index(cls, lst, index, default=''):
         return lst[index] if len(lst) > index else default
 
-    def series_date_format(self):
+        def series_date_format(self):
         if self.custom_type == 'DATETIME':
             date_formats = {
                 '%d-%m-%Y': 0, '%m-%d-%Y': 0, '%Y-%d-%m': 0, '%Y-%m-%d': 0,
