@@ -306,11 +306,16 @@ class DaysSeries:
             series.append(String(x))
         self.series = pd.Series(series)
 
-    def split_by_string(self, split_index, split_string):
+    def split_by_string(self, split_index, split_string, is_last=False):
         series = []
-        for x in self.series:
-            x = self.get_index(x.split(split_string), split_index)
-            series.append(String(x))
+        if is_last:
+            for x in self.series:
+                x = f'{split_string}'.join(x.split(split_string)[split_index:])
+                series.append(String(x))
+        else:
+            for x in self.series:
+                x = self.get_index(x.split(split_string), split_index)
+                series.append(String(x))
         self.series = pd.Series(series)
 
     @classmethod
@@ -325,7 +330,12 @@ class DaysSeries:
                 '%b-%d-%Y': 0, '%Y-%d-%b': 0, '%Y-%b-%d': 0, '%d-%b': 0,
                 '%b-%d': 0, '%Y-%b': 0, '%b-%Y': 0, '%d-%B-%Y': 0,
                 '%B-%d-%Y': 0, '%Y-%d-%B': 0, '%Y-%B-%d': 0, '%d-%B': 0,
-                '%B-%d': 0, '%Y-%B': 0, '%B-%Y': 0
+                '%Y-%B': 0, '%B-%Y': 0, '%d-%m-%y': 0, '%m-%d-%y': 0,
+                '%y-%d-%m': 0, '%y-%m-%d': 0, '%y-%m': 0, '%m-%y': 0,
+                '%d-%b-%y': 0, '%b-%d-%y': 0, '%y-%d-%b': 0, '%y-%b-%d': 0,
+                '%y-%b': 0, '%b-%y': 0, '%d-%B-%y': 0, '%B-%d-%y': 0,
+                '%y-%d-%B': 0, '%y-%B-%d': 0, '%y-%B': 0, '%B-%y': 0,
+                "%Y-%m-%d-%H:%M:%S": 0
             }
 
             def find_format(input_value):

@@ -632,8 +632,17 @@ class Actions:
                     ddf[new_index].split_by_index(limit_index=i,
                                                   split_indexes=split_indexes)
                 elif sub_action == 'splitString':
-                    ddf[new_index].split_by_string(split_index=i,
-                                                   split_string=split_string)
+                    if i == split_limit:
+                        ddf[new_index].split_by_string(
+                            split_index=i,
+                            split_string=split_string,
+                            is_last=True
+                        )
+                    else:
+                        ddf[new_index].split_by_string(
+                            split_index=i,
+                            split_string=split_string
+                        )
                 new_columns.append(new_index)
 
         if not keep_original:
