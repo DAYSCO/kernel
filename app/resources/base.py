@@ -298,6 +298,59 @@ class ColumnAction(GenericCall):
             }
 
 
+class BulkColumnAction(GenericCall):
+    def __init__(self, request, working_files):
+        super().__init__(request=request, working_files=working_files)
+        if not self.uid:
+            self.payload = {
+                'message': "id missing from headers request",
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                'kernel_status_code':
+                    status_codes['MissingHeaderAttributeError']
+            }
+        else:
+            action_sequence = self.json_response.get('inputParams', [{}])
+            ddf = deepcopy(self.working_files[self.uid])
+            new_columns = []
+            for action in action_sequence:
+                try:
+                    ddf, payload_res = Actions.execute(
+                        ddf=ddf,
+                        payload=action)
+                except (PayloadError,
+                        InvalidDataTypeError,
+                        DuplicateNameError,
+                        IDNotFoundError) as e:
+                    self.payload = {
+                        "message": str(e),
+                        "errors": [str(e)],
+                        'status_code': status.HTTP_400_BAD_REQUEST,
+                        'kernel_status_code': e.status_code
+                    }
+                    return
+                except Exception as e:
+                    self.payload = {
+                        "action": action,
+                        "message": str(e),
+                        "status_code": status.HTTP_404_NOT_FOUND,
+                        "kernel_status_code": status_codes['GeneralError'],
+                        "errors": [str(e)]
+                    }
+                    return
+
+                new_columns = payload_res.get('new_columns')
+                action = payload_res.get('action')
+                if action:
+                    ddf.update_action_sequence(action=action)
+
+            self.working_files.add(ddf)
+            self.payload = {
+                "newColumns": new_columns,
+                "message": self.return_message,
+                "status_code": self.return_code
+            }
+
+
 class TableAction(GenericCall):
     def __init__(self, request, working_files, action=None):
         super().__init__(request=request, working_files=working_files)

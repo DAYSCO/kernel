@@ -3,7 +3,6 @@ import re
 
 from uuid import uuid4
 import pandas as pd
-from dateutil.parser import parse
 
 from .suggest import Suggestion
 from .validate import Validation

@@ -279,6 +279,37 @@ class BasicTests(unittest.TestCase):
             self.config['test_96_validate_address']['check_result'])
         self.assertEqual(response.status_code, 200)
 
+    def test_97_bulk_action(self):
+        headers = {
+            "id": self.test_id,
+            "size": "702",
+            "name": "test_file.csv"
+        }
+        with open('tests/test_file.csv') as test_file:
+            contents = test_file.read()
+        response = self.app.post('/api/v1/read-file-contents',
+                                 headers=headers, data=contents)
+        self.assertEqual(response.status_code, 200)
+
+        headers = {
+            "Content-Type": "application/json",
+            "id": self.test_id
+        }
+
+        json = self.config['test_97_bulk_action']['payload']
+        response = self.app.put('/api/v1/column/bulk-action',
+                                headers=headers, json=json)
+        self.assertEqual(response.status_code, 200)
+
+        json = self.config['test_92_get_data']['payload']
+        response = self.app.post('/api/v1/table/data',
+                                 headers=headers, json=json)
+        print()
+        print(f"Bulk Actions")
+        self.assertEqual(_json.loads(response.data.decode("utf-8")),
+                         self.config['test_92_get_data']['check_result'])
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()
