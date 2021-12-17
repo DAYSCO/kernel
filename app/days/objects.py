@@ -171,6 +171,7 @@ class DaysSeries:
         self.visible = True
         self.suggest_type()
         self.series_date_format()
+        self.valid_count = self.non_null_count
 
     @property
     def row_count(self):
@@ -188,6 +189,7 @@ class DaysSeries:
             "index": self.index,
             "name": self.name,
             "nonNullCount": self.non_null_count,
+            "validCount": self.valid_count,
             "visible": self.visible
         }
 
@@ -232,6 +234,7 @@ class DaysSeries:
         if legacy:
             return Validation.validate(self.series, custom_type)
         self.series = Validation.validate(self.series, custom_type)
+        self.valid_count = len(self.series.loc[lambda x: x != 'INVALID'])
 
     def substitute(self, match_str, replace_str):
         if match_str:
