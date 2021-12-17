@@ -171,7 +171,7 @@ class DaysSeries:
         self.visible = True
         self.suggest_type()
         self.series_date_format()
-        self.valid_count = self.non_null_count
+        self.valid_count = -1
 
     @property
     def row_count(self):
