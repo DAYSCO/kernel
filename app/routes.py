@@ -89,6 +89,21 @@ def perform_column_action():
         return request_obj.return_message, request_obj.return_code
 
 
+@app_bp.route('/api/v1/column/bulk-action', methods=['PUT'])
+def perform_bulk_column_action():
+    logger.info(f"'perform_column_action' PUT request, {request.remote_addr}")
+    global working_files
+    request_obj = BulkColumnAction(
+        request=request,
+        working_files=working_files)
+    working_files = request_obj.working_files
+    logger.info(f"{request_obj.return_message} {request_obj.return_code}")
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code
+
+
 @app_bp.route('/api/v1/table/action', methods=['POST'])
 def perform_table_action():
     logger.info(f"'perform_table_action' POST request, {request.remote_addr}")

@@ -1206,5 +1206,406 @@
                 "800 E 9th St Apopka FL 32703-5416"
             ]
         }
+    },
+    "test_97_bulk_action": {
+        "payload": {
+            "action": "bulk",
+            "inputParams": [
+                {
+                    "action": "concatenate",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                6,
+                                7,
+                                8,
+                                9
+                            ],
+                            "joinChar": " "
+                        }
+                    ],
+                    "newColumns": [
+                        10
+                    ]
+                },
+                {
+                    "action": "changeType",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                0,
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                7,
+                                8,
+                                9,
+                                10,
+                                11
+                            ],
+                            "newType": [
+                                "FIRSTNAME",
+                                "LASTNAME",
+                                "EMAIL",
+                                "GENDER",
+                                "PHONENUMBER",
+                                "DATETIME",
+                                "STRING",
+                                "CITY",
+                                "STATE",
+                                "ZIP",
+                                "ADDRESS",
+                                "CCNUMBER"
+                            ]
+                        }
+                    ],
+                    "schema": [
+                        {
+                            "customType": "FIRSTNAME",
+                            "dataType": "string",
+                            "displayName": "first_name",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "5411818e-1af2-43d5-8d3c-f770ac90aff0",
+                            "index": 0,
+                            "name": "first_name",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "LASTNAME",
+                            "dataType": "string",
+                            "displayName": "last_name",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "6d59304f-58cf-471d-aefc-c99cd9043a5e",
+                            "index": 1,
+                            "name": "last_name",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "EMAIL",
+                            "dataType": "string",
+                            "displayName": "email",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "b16a3d71-2f25-486f-9ebb-f3c3ee2749e2",
+                            "index": 2,
+                            "name": "email",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "GENDER",
+                            "dataType": "string",
+                            "displayName": "gender",
+                            "distinctCount": 3,
+                            "extended": {},
+                            "id": "4b5ed421-228b-47f1-b942-05aef6f7ae23",
+                            "index": 3,
+                            "name": "gender",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "PHONENUMBER",
+                            "dataType": "string",
+                            "displayName": "phone_number",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "7498b1ba-0761-438d-b77d-f1400aa2b9a0",
+                            "index": 4,
+                            "name": "phone_number",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "DATETIME",
+                            "dataType": "string",
+                            "displayName": "dob",
+                            "distinctCount": 5,
+                            "extended": {
+                                "dateFormat": "%m-%d-%Y"
+                            },
+                            "id": "720283cf-48eb-4baa-ad49-a1aba7d629ad",
+                            "index": 5,
+                            "name": "dob",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "STRING",
+                            "dataType": "string",
+                            "displayName": "address",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "4587dadf-1680-4455-977a-37888b7c58cf",
+                            "index": 6,
+                            "name": "address",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "LASTNAME",
+                            "dataType": "string",
+                            "displayName": "city",
+                            "distinctCount": 4,
+                            "extended": {},
+                            "id": "5d0f3f37-0e55-46cd-aa0e-921230e9fd06",
+                            "index": 7,
+                            "name": "city",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "LASTNAME",
+                            "dataType": "string",
+                            "displayName": "state",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "eeb3af49-6956-4ca6-b287-7faec038774c",
+                            "index": 8,
+                            "name": "state",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "ZIP",
+                            "dataType": "string",
+                            "displayName": "zipcode",
+                            "distinctCount": 2,
+                            "extended": {},
+                            "id": "e293f548-5c24-4b51-9983-1227b1330029",
+                            "index": 9,
+                            "name": "zipcode",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "STRING",
+                            "dataType": "string",
+                            "displayName": "address_city_state_zipcode_combine",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "788af88d-f6f2-49b6-afca-ca02dee6309d",
+                            "index": 10,
+                            "name": "address_city_state_zipcode_combine",
+                            "nonNullCount": 5,
+                            "visible": true
+                        },
+                        {
+                            "customType": "CCNUMBER",
+                            "dataType": "string",
+                            "displayName": "cc_number",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "37165271-3ab9-48f9-baf0-c32bcf198fe6",
+                            "index": 11,
+                            "name": "cc_number",
+                            "nonNullCount": 5,
+                            "visible": true
+                        }
+                    ]
+                },
+                {
+                    "action": "validate",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                2,
+                                3,
+                                4,
+                                5,
+                                10,
+                                11
+                            ],
+                            "validType": [
+                                "EMAIL",
+                                "GENDER",
+                                "PHONENUMBER",
+                                "DATETIME",
+                                "FULLADDRESS",
+                                "CCNUMBER"
+                            ]
+                        }
+                    ],
+                    "newColumns": [
+                        3,
+                        5,
+                        7,
+                        9,
+                        15,
+                        17
+                    ]
+                },
+                {
+                    "action": "rename",
+                    "inputParams": [
+                        {
+                            "displayNames": [
+                                "valid_address"
+                            ],
+                            "indexes": [
+                                15
+                            ]
+                        }
+                    ],
+                    "schema": [
+                        {
+                            "customType": "STRING",
+                            "dataType": "string",
+                            "displayName": "address_city_state_zipcode_combine_validate",
+                            "distinctCount": 5,
+                            "extended": {},
+                            "id": "ca769cee-ae1f-4af8-ad94-9290a3ddd9c0",
+                            "index": 15,
+                            "name": "address_city_state_zipcode_combine_validate",
+                            "nonNullCount": 5,
+                            "visible": true
+                        }
+                    ]
+                },
+                {
+                    "action": "remove",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                14
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "action": "substitute",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                2
+                            ],
+                            "matchStr": ".net",
+                            "replaceStr": ".com"
+                        }
+                    ],
+                    "newColumns": [
+                        3
+                    ]
+                },
+                {
+                    "action": "substitute",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                2
+                            ],
+                            "matchStr": ".net",
+                            "replaceStr": ".com"
+                        }
+                    ],
+                    "newColumns": [
+                        3
+                    ]
+                },
+                {
+                    "action": "substitute",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                2
+                            ],
+                            "matchStr": ".net",
+                            "replaceStr": ".com"
+                        }
+                    ],
+                    "newColumns": [
+                        3
+                    ]
+                },
+                {
+                    "action": "updateValue",
+                    "inputParams": [
+                        {
+                            "indexes": 1,
+                            "newValue": "test",
+                            "targetRowIndex": 2
+                        }
+                    ],
+                    "oldValue": "Marrington"
+                },
+                {
+                    "action": "insertString",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                0
+                            ],
+                            "insertIndex": 2,
+                            "insertString": "FooBar"
+                        }
+                    ],
+                    "newColumns": [
+                        1
+                    ]
+                },
+                {
+                    "action": "formatDateTime",
+                    "inputParams": [
+                        {
+                            "datetimeFormat": "%d-%m-%Y",
+                            "indexes": [
+                                12
+                            ]
+                        }
+                    ],
+                    "newColumns": [
+                        13
+                    ]
+                },
+                {
+                    "action": "split",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                0
+                            ],
+                            "keepOriginal": true,
+                            "splitIndexes": [
+                                4,
+                                6
+                            ]
+                        }
+                    ],
+                    "newColumns": [
+                        1,
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "action": "split",
+                    "inputParams": [
+                        {
+                            "indexes": [
+                                0
+                            ],
+                            "splitStringMeta": {
+                                "splitLimit": 1,
+                                "splitString": "a"
+                            }
+                        }
+                    ],
+                    "newColumns": [
+                        1,
+                        2
+                    ]
+                }
+            ],
+            "mustAll": true
+        },
+        "check_result": {
+        }
     }
 }
