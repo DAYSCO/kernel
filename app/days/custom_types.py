@@ -337,6 +337,33 @@ class Datetime(str):
         self.timezone = str()
 
 
+class Date(str):
+    """
+    raw = "12/31/2001"
+    weekday = "Monday"
+    weekday_abbrev = "Mon"
+    weekday_number = "1"
+    day_of_month = "31"
+    month_name = "December"
+    month_name_abbrev = "Dec"
+    month_number = "12"
+    year = "2001"
+    year_abbrev = "01"
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.VALIDATION_META = {"valid": None, "errors": list()}
+        self.weekday = str()
+        self.weekday_abbrev = str()
+        self.weekday_number = str()
+        self.day_of_month = str()
+        self.month_name = str()
+        self.month_name_abbrev = str()
+        self.month_number = str()
+        self.year = str()
+        self.year_abbrev = str()
+
+
 class Patterns:
     BOOLEAN = [r"^(true|t|1)$", r"^(false|f|0)$" ]
     BOOLEAN_VALUES = [True, False]

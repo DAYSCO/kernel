@@ -325,7 +325,21 @@ class DaysSeries:
         return lst[index] if len(lst) > index else default
 
     def series_date_format(self):
-        if self.custom_type == 'DATETIME':
+
+        def find_format(input_value):
+            if input_value:
+                _value = re.split(" |,|;|-|/|'|at|on|and|of|st|nd|rd|th",
+                                  input_value)
+                _value = '-'.join([_ for _ in _value if _])
+                for _format in date_formats.keys():
+                    try:
+                        datetime.datetime.strptime(_value, _format)
+                        return _format
+                    except:
+                        pass
+            return None
+
+        if self.custom_type == 'DATE':
             date_formats = {
                 '%d-%m-%Y': 0, '%m-%d-%Y': 0, '%Y-%d-%m': 0, '%Y-%m-%d': 0,
                 '%d-%m': 0, '%m-%d': 0, '%Y-%m': 0, '%m-%Y': 0, '%d-%b-%Y': 0,
@@ -337,21 +351,55 @@ class DaysSeries:
                 '%d-%b-%y': 0, '%b-%d-%y': 0, '%y-%d-%b': 0, '%y-%b-%d': 0,
                 '%y-%b': 0, '%b-%y': 0, '%d-%B-%y': 0, '%B-%d-%y': 0,
                 '%y-%d-%B': 0, '%y-%B-%d': 0, '%y-%B': 0, '%B-%y': 0,
-                "%Y-%m-%d-%H:%M:%S": 0
             }
 
-            def find_format(input_value):
-                if input_value:
-                    _value = re.split(" |,|;|-|/|'|at|on|and|of|st|nd|rd|th",
-                                      input_value)
-                    _value = '-'.join([_ for _ in _value if _])
-                    for _format in date_formats.keys():
-                        try:
-                            datetime.datetime.strptime(_value, _format)
-                            return _format
-                        except:
-                            pass
-                return None
+            for value in self.series:
+                _ = find_format(value)
+                if _ in date_formats.keys():
+                    date_formats[_] += 1
+
+            date_formats = dict(
+                sorted(date_formats.items(), key=lambda item: item[1],
+                       reverse=True))
+
+            self.extended['dateFormat'] = list(date_formats.keys())[0]
+        elif self.custom_type == 'DATETIME':
+            date_formats = {
+                '%d-%m-%Y-%H:%M:%S': 0, '%m-%d-%Y-%H:%M:%S': 0,
+                '%Y-%d-%m-%H:%M:%S': 0, '%Y-%m-%d-%H:%M:%S': 0,
+                '%d-%m-%H:%M:%S': 0, '%m-%d-%H:%M:%S': 0,
+                '%Y-%m-%H:%M:%S': 0, '%m-%Y-%H:%M:%S': 0,
+                '%d-%b-%Y-%H:%M:%S': 0, '%b-%d-%Y-%H:%M:%S': 0,
+                '%Y-%d-%b-%H:%M:%S': 0, '%Y-%b-%d-%H:%M:%S': 0,
+                '%d-%b-%H:%M:%S': 0, '%b-%d-%H:%M:%S': 0, '%Y-%b-%H:%M:%S': 0,
+                '%b-%Y-%H:%M:%S': 0, '%d-%B-%Y-%H:%M:%S': 0,
+                '%B-%d-%Y-%H:%M:%S': 0, '%Y-%d-%B-%H:%M:%S': 0,
+                '%Y-%B-%d-%H:%M:%S': 0, '%d-%B-%H:%M:%S': 0,
+                '%Y-%B-%H:%M:%S': 0, '%B-%Y-%H:%M:%S': 0,
+                '%d-%m-%y-%H:%M:%S': 0, '%m-%d-%y-%H:%M:%S': 0,
+                '%y-%d-%m-%H:%M:%S': 0, '%y-%m-%d-%H:%M:%S': 0,
+                '%y-%m-%H:%M:%S': 0, '%m-%y-%H:%M:%S': 0,
+                '%d-%b-%y-%H:%M:%S': 0, '%b-%d-%y-%H:%M:%S': 0,
+                '%y-%d-%b-%H:%M:%S': 0, '%y-%b-%d-%H:%M:%S': 0,
+                '%y-%b-%H:%M:%S': 0, '%b-%y-%H:%M:%S': 0,
+                '%d-%B-%y-%H:%M:%S': 0, '%B-%d-%y-%H:%M:%S': 0,
+                '%y-%d-%B-%H:%M:%S': 0, '%y-%B-%d-%H:%M:%S': 0,
+                '%y-%B-%H:%M:%S': 0, '%B-%y-%H:%M:%S': 0, '%d-%m-%Y-%H:%M': 0,
+                '%m-%d-%Y-%H:%M': 0, '%Y-%d-%m-%H:%M': 0, '%Y-%m-%d-%H:%M': 0,
+                '%d-%m-%H:%M': 0, '%m-%d-%H:%M': 0, '%Y-%m-%H:%M': 0,
+                '%m-%Y-%H:%M': 0, '%d-%b-%Y-%H:%M': 0, '%b-%d-%Y-%H:%M': 0,
+                '%Y-%d-%b-%H:%M': 0, '%Y-%b-%d-%H:%M': 0, '%d-%b-%H:%M': 0,
+                '%b-%d-%H:%M': 0, '%Y-%b-%H:%M': 0, '%b-%Y-%H:%M': 0,
+                '%d-%B-%Y-%H:%M': 0, '%B-%d-%Y-%H:%M': 0, '%Y-%d-%B-%H:%M': 0,
+                '%Y-%B-%d-%H:%M': 0, '%d-%B-%H:%M': 0, '%Y-%B-%H:%M': 0,
+                '%B-%Y-%H:%M': 0, '%d-%m-%y-%H:%M': 0, '%m-%d-%y-%H:%M': 0,
+                '%y-%d-%m-%H:%M': 0, '%y-%m-%d-%H:%M': 0, '%y-%m-%H:%M': 0,
+                '%m-%y-%H:%M': 0, '%d-%b-%y-%H:%M': 0, '%b-%d-%y-%H:%M': 0,
+                '%y-%d-%b-%H:%M': 0, '%y-%b-%d-%H:%M': 0, '%y-%b-%H:%M': 0,
+                '%b-%y-%H:%M': 0, '%d-%B-%y-%H:%M': 0, '%B-%d-%y-%H:%M': 0,
+                '%y-%d-%B-%H:%M': 0, '%y-%B-%d-%H:%M': 0, '%y-%B-%H:%M': 0,
+                '%B-%y-%H:%M': 0,
+            }
 
             for value in self.series:
                 _ = find_format(value)
