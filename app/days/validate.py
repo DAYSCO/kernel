@@ -46,6 +46,8 @@ class Validation:
             series = series.apply(cls.ss_number, invalid=invalid)
         elif custom_type == "CCNUMBER":
             series = series.apply(cls.cc_number, invalid=invalid)
+        elif custom_type == "DATE":
+            series = series.apply(cls.date, invalid=invalid)
         elif custom_type == "DATETIME":
             series = series.apply(cls.datetime, invalid=invalid)
         return series
@@ -149,6 +151,28 @@ class Validation:
         val.microsecond = p_val.strftime("%f")
         val.utc_offset = p_val.strftime("%z")
         val.timezone = p_val.strftime("%Z")
+        return val
+
+    @classmethod
+    def date(cls, val, invalid="INVALID"):
+        try:
+            p_val = parse(val)
+        except:
+            new_val = Date(invalid)
+            new_val.VALIDATION_META['valid'] = False
+            new_val.VALIDATION_META['errors'].append(
+                "Value could not be parsed.")
+            return new_val
+        val.VALIDATION_META['valid'] = True
+        val.weekday = p_val.strftime("%A")
+        val.weekday_abbrev = p_val.strftime("%a")
+        val.weekday_number = p_val.strftime("%w")
+        val.day_of_month = p_val.strftime("%d")
+        val.month_name = p_val.strftime("%B")
+        val.month_name_abbrev = p_val.strftime("%b")
+        val.month_number = p_val.strftime("%m")
+        val.year = p_val.strftime("%Y")
+        val.year_abbrev = p_val.strftime("%y")
         return val
 
     @classmethod

@@ -38,6 +38,7 @@ class Suggestion:
             (cls.enum, "ENUM", Enum),
             (cls.number, "NUMBER", Number),
             (cls.integer, "INTEGER", Integer),
+            (cls.date, "DATE", Date),
             (cls.datetime, "DATETIME", Datetime),
             (cls.street_address, "STREETADDRESS", StreetAddress),
             (cls.full_address, "FULLADDRESS", FullAddress),
@@ -114,6 +115,23 @@ class Suggestion:
     def country(cls, series):
         return cls.lookup_match(cls.sample(series),
                                 COUNTRY_DATA, cls.THRESHOLD)
+
+    @classmethod
+    def date(cls, series):
+        sample = cls.sample(series)
+        row_count = len(sample)
+        true_values = 0
+        for val in sample:
+            try:
+                value = parse(val)
+                if value.hour == 0 & value.minute:
+                    true_values += 1
+            except:
+                pass
+        if true_values >= (row_count * cls.THRESHOLD):
+            return True
+        else:
+            return False
 
     @classmethod
     def datetime(cls, series):
