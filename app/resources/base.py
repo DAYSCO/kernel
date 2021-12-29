@@ -413,37 +413,31 @@ class ValidationAction:
         self.return_message = "successful request"
         self.return_code = status.HTTP_200_OK
         self.payload = {}
-        if version == 'v2':
-            results = self.validate_us_address
+        self.payload = self.validate_address(version)
+
+    def validate_address(self, version):
+        address = self.json_response['inputParams'][0].get('address', '')
+        address2 = self.json_response['inputParams'][0].get('address2', '')
+        city = self.json_response['inputParams'][0].get('city', '')
+        state = self.json_response['inputParams'][0].get('state', '')
+        zip_code = self.json_response['inputParams'][0].get('zipCode', '')
+        if version == 'v3':
+            full_address = f"{address} {address2}, {city}, {state} {zip_code}"
+            results = Validation.here_address_validation(address=full_address)
+        elif version == 'v2':
+            results = Validation.smartystreet_us_street(
+                address=address,
+                address2=address2,
+                city=city,
+                state=state,
+                zip_code=zip_code
+            )
         else:
-            results = self.validate_address
-        self.payload = results
-
-    @property
-    def validate_address(self):
-        address = self.json_response['inputParams'][0]['address']
-        if isinstance(address, str):
-            address = [address]
-        results = Validation.smartystreet_auto_complete(address_full=address)
-
-        return {
-            'results': results
-        }
-
-    @property
-    def validate_us_address(self):
-        address = self.json_response['inputParams'][0]['address']
-        address2 = self.json_response['inputParams'][0]['address2']
-        city = self.json_response['inputParams'][0]['city']
-        state = self.json_response['inputParams'][0]['state']
-        zip_code = self.json_response['inputParams'][0]['zipCode']
-        results = Validation.smartystreet_us_street(
-            address=address,
-            address2=address2,
-            city=city,
-            state=state,
-            zip_code=zip_code
-        )
+            address = self.json_response['inputParams'][0]['address']
+            if isinstance(address, str):
+                address = [address]
+            results = Validation.smartystreet_auto_complete(
+                address_full=address)
 
         return {
             'results': results

@@ -191,3 +191,15 @@ def address_validation_action():
         return request_obj.payload, request_obj.return_code
     else:
         return request_obj.return_message, request_obj.return_code
+
+
+@app_bp.route('/api/v3/address/validate', methods=['POST'])
+def here_address_validation_action():
+    logger.info(f"'perform HERE address validation action' "
+                f"{request.method} request, {request.remote_addr}")
+    request_obj = ValidationAction(request=request, version='v3')
+    logger.info(f"{request_obj.return_message} {request_obj.return_code}")
+    if request_obj.payload:
+        return request_obj.payload, request_obj.return_code
+    else:
+        return request_obj.return_message, request_obj.return_code
