@@ -4,6 +4,7 @@ import pandas as pd
 import idna
 import re
 
+from herepy import GeocoderApi
 from smartystreets_python_sdk import (StaticCredentials, exceptions, Batch,
                                       SharedCredentials, ClientBuilder)
 from smartystreets_python_sdk.us_street import Lookup as StreetLookup
@@ -25,6 +26,8 @@ class Validation:
         'SMARTYSTREETS_AUTH_ID', '5aa199f9-3d5f-f2ba-b41f-74b953b5d1d6')
     USERID = "467DAYS06449"
     KEY_ID = os.environ.get("KEY_ID", '33603386701207625')
+    HERE_API_KEY = os.environ.get(
+        "HERE_API_KEY", 'b4cg0oU9l7RZhWn_iDOm1PMfKybyYJNHmlRZiQSsvik')
     SMARTYSTREETS_HOSTNAME = os.environ.get("SMARTYSTREETS_HOSTNAME",
                                             "playwithmydata.com/")
 
@@ -403,4 +406,12 @@ class Validation:
             full_address = f'{address} {address2} {city}, {state} {zip_code}'
             results = cls.smartystreet_auto_complete([full_address])
 
+        return results
+
+    @classmethod
+    def here_address_validation(cls, address):
+        geocoder_api = GeocoderApi(api_key=cls.HERE_API_KEY)
+        response = geocoder_api.free_form(address)
+        items = response.as_dict()
+        results = [item['title'] for item in items.get('items')]
         return results
