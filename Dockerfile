@@ -2,16 +2,16 @@
 FROM python:3.9-slim-buster
 
 #Copy kernel project to image
-COPY . /app/days-kernel
-
-# kernel needs a logs directory
-RUN mkdir /app/logs
+COPY . .
 
 #install required python packages
-RUN pip3 install -r /app/days-kernel/requirements.txt
+RUN pip install --upgrade pip
+
+#install required python packages
+RUN pip install -r /requirements.txt
 
 #expose port 5000
 EXPOSE 5000
 
 # Start the server
-ENTRYPOINT ["python3","/app/days-kernel/run.py","5000"]
+ENTRYPOINT [ "waitress-serve", "--host", "0.0.0.0", "--port", "5000", "run:app" ]

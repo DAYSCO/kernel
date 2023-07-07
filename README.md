@@ -9,6 +9,13 @@ Run in shell window (5000 would be the port):
 python3 run.py 5000
 ```
 
+## Developing
+
+Direnv on mac
+```shell
+eval "$(direnv hook bash)"
+```
+
 ## API Request List
 ### -- POST --
 #### UPLOAD FILE
